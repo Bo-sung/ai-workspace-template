@@ -1,0 +1,22 @@
+# Editor settings
+.obsidian/
+
+# AI Agent files
+.claude/
+.cursor/
+.windsurf/
+.aider/
+.continue/
+.copilot/
+.github/copilot/
+.tabnine/
+.codeium/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*~

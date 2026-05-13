@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>영지 시스템 프로토타입</title>
+    <style>
+        :root {
+            --tile-size: 40px;
+            --bg-color: #2c3e50;
+            --ui-bg: rgba(0, 0, 0, 0.85);
+            --text-color: #ecf0f1;
+            --accent-color: #f1c40f;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+        }
+
+        /* 게임 컨테이너 */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #34495e;
+            overflow: auto;
+        }
+
+        /* --- 상단 자원 UI --- */
+        #top-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--ui-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            z-index: 100;
+            border-bottom: 2px solid #555;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .res-icon { font-size: 18px; }
+
+        /* --- 맵 (그리드) --- */
+        #map-area {
+            /* 20x20 맵, 각 타일 40px */
+            width: calc(20 * var(--tile-size));
+            height: calc(20 * var(--tile-size));
+            background-color: #27ae60; /* 잔디 색 */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: var(--tile-size) var(--tile-size);
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            border: 20px solid #2c3e50; /* 맵 외부 여백 */
+        }
+
+        /* 건물 및 오브젝트 공통 스타일 */
+        .object {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-size: 12px;
+            font-weight: bold;
+            box-sizing: border-box;
+            border: 1px solid rgba(0,0,0,0.2);
+            box-shadow: 2px 5px 10px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
+            z-index: 10;
+            border-radius: 4px;
+        }
+        
+        /* 건물 아이콘/라벨 */
+        .object span.icon { font-size: 20px; display: block; margin-bottom: 2px; }
+
+        /* 건물 종류별 스타일 */
+        .obj-wall { background: #555; color: #fff; z-index: 5; border-radius: 0; box-shadow: none; border: 1px solid #444; }
+        .obj-castle { 
+            background: linear-gradient(135deg, #8e44ad, #9b59b6); 
+            color: #fff; 
+            border: 3px solid #f1c40f; 
+            z-index: 6; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .obj-farm { background: #f1c40f; color: #333; }
+        .obj-mine { background: #3498db; color: #fff; }
+        .obj-barracks { background: #c0392b; color: #fff; }
+        .obj-tavern { background: #e67e22; color: #fff; }
+
+        /* 미리보기 (고스트) */
+        .preview {
+            position: absolute;
+            background: rgba(46, 204, 113, 0.6);
+            border: 2px dashed #fff;
+            pointer-events: none;
+            z-index: 50;
+            display: none;
+            border-radius: 4px;
+            transition: background 0.1s;
+        }
+        .preview.invalid {
+            background: rgba(231, 76, 60, 0.6);
+            border-color: #c0392b;
+        }
+
+        /* 영웅 (돌아다니는 NPC) */
+        .hero {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            transition: top 2s linear, left 2s linear; /* 부드러운 이동 */
+            z-index: 20;
+            box-shadow: 0 5px 5px rgba(0,0,0,0.3);
+        }
+
+        /* --- 하단 메뉴 UI --- */
+        #bottom-ui {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ui-bg);
+            padding: 15px 25px;
+            border-radius: 15px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            border: 1px solid #555;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-build {
+            background: #34495e;
+            border: 1px solid #7f8c8d;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 80px;
+            height: 80px;
+            transition: all 0.2s;
+        }
+        .btn-build:hover { transform: translateY(-5px); background: #3d566e; }
+        .btn-build.active {
+            background: #1abc9c;
+            border-color: #16a085;
+            box-shadow: 0 0 10px #1abc9c;
+        }
+        .btn-build .b-icon { font-size: 24px; }
+        .btn-build .b-name { font-size: 11px; opacity: 0.9; }
+        .btn-build .b-size { font-size: 10px; opacity: 0.6; }
+
+    </style>
+</head>
+<body>
+
+    <div id="top-ui">
+        <div class="resource-item"><span class="res-icon">🌾</span> 식량 <span id="res-food">1,000</span></div>
+        <div class="resource-item"><span class="res-icon">💎</span> 마석 <span id="res-magic">500</span></div>
+        <div class="resource-item"><span class="res-icon">📦</span> 보급 <span id="res-supply">200</span></div>
+        <div class="resource-item"><span class="res-icon">⛑️</span> 인력 <span id="res-man">50</span></div>
+        <div class="resource-item"><span class="res-icon">🪙</span> 은화 <span id="res-silver">5,000</span></div>
+    </div>
+
+    <div id="game-container">
+        <div id="map-area">
+            <div id="preview-box" class="preview"></div>
+        </div>
+    </div>
+
+    <div id="bottom-ui">
+        <button class="btn-build" onclick="setBuildMode('farm', 2, 2, '🌾')">
+            <span class="b-icon">🌾</span>
+            <span class="b-name">농장</span>
+            <span class="b-size">2x2</span>
+        </button>
+        <button class="btn-build" onclick="setBuildMode('mine', 2, 2, '💎')">
+            <span class="b-icon">💎</span>
+            <span class="b-name">광산</span>
+            <span class="b-size">2x2</span>
+        </button>
+        <button class="btn-build" onclick="setBuildMode('barracks', 2, 2, '⚔️')">
+            <span class="b-icon">⚔️</span>
+            <span class="b-name">훈련소</span>
+            <span class="b-size">2x2</span>
+        </button>
+        <button class="btn-build" onclick="setBuildMode('tavern', 3, 2, '🍺')">
+            <span class="b-icon">🍺</span>
+            <span class="b-name">주점</span>
+            <span class="b-size">3x2</span>
+        </button>
+        <button class="btn-build" style="background:#c0392b" onclick="cancelBuildMode()">
+            <span class="b-icon">❌</span>
+            <span class="b-name">취소</span>
+        </button>
+    </div>
+
+    <script>
+        // --- 1. 설정 및 초기화 ---
+        const TILE_SIZE = 40;
+        const MAP_SIZE = 20; // 20x20 격자
+        const mapArea = document.getElementById('map-area');
+        const previewBox = document.getElementById('preview-box');
+        
+        // 맵 데이터 (0: 빈땅, 1: 점유됨)
+        let mapData = Array(MAP_SIZE).fill().map(() => Array(MAP_SIZE).fill(0));
+        
+        let currentBuildMode = null; // 현재 선택된 건물 정보 { type, w, h, icon }
+
+        // --- 2. 맵 생성 함수 ---
+        function initMap() {
+            // 성벽 배치 (외곽선)
+            for(let y=0; y<MAP_SIZE; y++) {
+                for(let x=0; x<MAP_SIZE; x++) {
+                    if(y===0 || y===MAP_SIZE-1 || x===0 || x===MAP_SIZE-1) {
+                        createBuildingElement('wall', x, y, 1, 1, '🧱', '성벽');
+                        mapData[y][x] = 1;
+                    }
+                }
+            }
+
+            // 영주성 배치 (중앙)
+            const cx = Math.floor(MAP_SIZE/2) - 2; // 4x4 크기라 중심 잡기
+            const cy = Math.floor(MAP_SIZE/2) - 2;
+            createBuildingElement('castle', cx, cy, 4, 4, '🏰', '영주성');
+            
+            // 영주성 자리 점유 처리
+            for(let y=cy; y<cy+4; y++){
+                for(let x=cx; x<cx+4; x++){
+                    mapData[y][x] = 1;
+                }
+            }
+
+            // 초기 영웅 소환
+            spawnHero('🤴');
+            spawnHero('🛡️');
+            spawnHero('🧙‍♂️');
+        }
+
+        // --- 3. 건물 생성 및 배치 ---
+        function createBuildingElement(type, x, y, w, h, icon, name = '') {
+            const div = document.createElement('div');
+            div.className = `object obj-${type}`;
+            div.style.left = `${x * TILE_SIZE}px`;
+            div.style.top = `${y * TILE_SIZE}px`;
+            div.style.width = `${w * TILE_SIZE}px`;
+            div.style.height = `${h * TILE_SIZE}px`;
+            
+            div.innerHTML = `<span class="icon">${icon}</span>${name ? `<span>${name}</span>` : ''}`;
+            mapArea.appendChild(div);
+        }
+
+        // --- 4. 인터랙션 (건설 모드) ---
+        function setBuildMode(type, w, h, icon) {
+            currentBuildMode = { type, w, h, icon };
+            
+            // 버튼 활성화 UI 처리
+            document.querySelectorAll('.btn-build').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function cancelBuildMode() {
+            currentBuildMode = null;
+            previewBox.style.display = 'none';
+            document.querySelectorAll('.btn-build').forEach(btn => btn.classList.remove('active'));
+        }
+
+        // 마우스 이동 이벤트 (미리보기)
+        mapArea.addEventListener('mousemove', (e) => {
+            if (!currentBuildMode) return;
+
+            const rect = mapArea.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // 그리드 좌표 계산
+            const gx = Math.floor(mouseX / TILE_SIZE);
+            const gy = Math.floor(mouseY / TILE_SIZE);
+
+            // 범위 체크
+            if (gx < 0 || gy < 0 || gx + currentBuildMode.w > MAP_SIZE || gy + currentBuildMode.h > MAP_SIZE) {
+                previewBox.style.display = 'none';
+                return;
+            }
+
+            // 미리보기 위치 업데이트
+            previewBox.style.display = 'block';
+            previewBox.style.width = `${currentBuildMode.w * TILE_SIZE}px`;
+            previewBox.style.height = `${currentBuildMode.h * TILE_SIZE}px`;
+            previewBox.style.left = `${gx * TILE_SIZE}px`;
+            previewBox.style.top = `${gy * TILE_SIZE}px`;
+
+            // 충돌 체크 및 색상 변경
+            if (checkCollision(gx, gy, currentBuildMode.w, currentBuildMode.h)) {
+                previewBox.classList.add('invalid'); // 빨간색
+            } else {
+                previewBox.classList.remove('invalid'); // 초록색
+            }
+        });
+
+        // 클릭 이벤트 (건설 확정)
+        mapArea.addEventListener('click', (e) => {
+            if (!currentBuildMode) return;
+            if (previewBox.classList.contains('invalid')) {
+                alert("여기에 지을 수 없습니다!");
+                return;
+            }
+            if (previewBox.style.display === 'none') return;
+
+            // 현재 미리보기 위치 가져오기
+            const left = parseInt(previewBox.style.left);
+            const top = parseInt(previewBox.style.top);
+            const gx = left / TILE_SIZE;
+            const gy = top / TILE_SIZE;
+
+            // 건물 생성
+            createBuildingElement(currentBuildMode.type, gx, gy, currentBuildMode.w, currentBuildMode.h, currentBuildMode.icon);
+
+            // 데이터 점유 업데이트
+            for(let y=gy; y<gy+currentBuildMode.h; y++){
+                for(let x=gx; x<gx+currentBuildMode.w; x++){
+                    mapData[y][x] = 1;
+                }
+            }
+
+            // 자원 차감 연출 (단순 로그)
+            console.log(`${currentBuildMode.type} 건설 완료! 자원 소모.`);
+        });
+
+        // 충돌 체크 함수
+        function checkCollision(x, y, w, h) {
+            for(let i=y; i<y+h; i++) {
+                for(let j=x; j<x+w; j++) {
+                    if (mapData[i][j] !== 0) return true; // 이미 점유됨
+                }
+            }
+            return false;
+        }
+
+
+        // --- 5. 영웅 생활 (AI) ---
+        function spawnHero(icon) {
+            const hero = document.createElement('div');
+            hero.className = 'hero';
+            hero.innerText = icon;
+            
+            // 랜덤 시작 위치 (성벽 안쪽)
+            let x = 5, y = 5;
+            hero.style.left = `${x * TILE_SIZE}px`;
+            hero.style.top = `${y * TILE_SIZE}px`;
+            
+            mapArea.appendChild(hero);
+
+            // 주기적으로 이동
+            setInterval(() => {
+                const directions = [[0,1], [0,-1], [1,0], [-1,0]]; // 상하좌우
+                const dir = directions[Math.floor(Math.random() * directions.length)];
+                
+                const nextX = x + dir[0];
+                const nextY = y + dir[1];
+
+                // 맵 밖으로 안 나가게 & 성벽 안뚫게 (간단 체크)
+                if(nextX > 1 && nextX < MAP_SIZE-2 && nextY > 1 && nextY < MAP_SIZE-2) {
+                    x = nextX;
+                    y = nextY;
+                    hero.style.left = `${x * TILE_SIZE + 5}px`; // +5는 중앙 정렬 보정
+                    hero.style.top = `${y * TILE_SIZE + 5}px`;
+                }
+            }, 2000 + Math.random() * 1000); // 2~3초마다 이동
+        }
+
+        // 실행
+        initMap();
+
+    </script>
+</body>
+</html>

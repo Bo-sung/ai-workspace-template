@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게임 UI 레이아웃 (가로)</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding: 40px;
+        }
+        .screen {
+            width: 800px;
+            height: 450px;
+            border: 3px solid #4a4a6a;
+            border-radius: 15px;
+            background: #16213e;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .screen-title {
+            text-align: center;
+            padding: 6px;
+            background: #0f3460;
+            font-weight: bold;
+            font-size: 12px;
+            color: #e94560;
+        }
+
+        /* 공통 */
+        .battle-field {
+            flex: 1;
+            background: linear-gradient(90deg, #2d4a3e 0%, #3d5a4e 20%, #4a6a5e 80%, #5a7a6e 100%);
+            position: relative;
+            display: flex;
+        }
+        .wall-area {
+            width: 50px;
+            background: linear-gradient(90deg, #5a4a3a, #4a3a2a);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-right: 4px solid #8a7a6a;
+        }
+        .wall-weapon {
+            width: 35px;
+            height: 35px;
+            background: #3a3a4a;
+            border: 2px solid #6a6a7a;
+            border-radius: 5px;
+            margin: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            text-align: center;
+        }
+        .combat-zone {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 1px;
+            padding: 5px;
+        }
+        .grid-cell {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+        }
+        .grid-cell.hero {
+            background: #4a90e2;
+            border: 2px solid #6ab0ff;
+            font-weight: bold;
+        }
+        .grid-cell.barricade {
+            background: #8b4513;
+            border: 2px solid #a0522d;
+        }
+        .grid-cell.trap {
+            background: #654321;
+            border: 2px solid #876543;
+        }
+        .spawn-area {
+            width: 30px;
+            background: rgba(200, 50, 50, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+        }
+        .spawn-arrow {
+            color: #e94560;
+            font-size: 14px;
+        }
+
+        /* 하단 메뉴 */
+        .bottom-menu {
+            height: 90px;
+            background: #1a1a3e;
+            border-top: 2px solid #4a4a6a;
+            display: flex;
+            padding: 8px;
+            gap: 8px;
+        }
+        .menu-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .menu-section-title {
+            font-size: 9px;
+            color: #e94560;
+            text-align: center;
+        }
+        .hero-slots {
+            display: flex;
+            gap: 4px;
+        }
+        .hero-slot {
+            width: 60px;
+            height: 55px;
+            background: #2a2a4a;
+            border: 2px solid #4a4a6a;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            text-align: center;
+        }
+        .hero-slot.selected {
+            border-color: #e94560;
+            box-shadow: 0 0 8px #e94560;
+        }
+        .action-btns {
+            display: flex;
+            gap: 4px;
+        }
+        .action-btn {
+            padding: 8px 12px;
+            background: #0f3460;
+            border: 2px solid #4a4a6a;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #eee;
+            text-align: center;
+        }
+        .action-btn.active {
+            background: #e94560;
+            border-color: #ff6580;
+        }
+        .barricade-slots {
+            display: flex;
+            gap: 4px;
+        }
+        .barricade-item {
+            width: 50px;
+            height: 55px;
+            background: #2a2a4a;
+            border: 1px solid #4a4a6a;
+            border-radius: 3px;
+            font-size: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .start-btn {
+            padding: 15px 25px;
+            background: #e94560;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            margin-left: auto;
+            align-self: center;
+        }
+        .divider {
+            width: 2px;
+            background: #4a4a6a;
+            margin: 0 5px;
+        }
+
+        /* 전투 단계 하단 */
+        .battle-bottom-menu {
+            height: 85px;
+            background: #1a1a3e;
+            border-top: 2px solid #4a4a6a;
+            display: flex;
+            padding: 8px;
+            gap: 8px;
+        }
+        .hero-status-slots {
+            display: flex;
+            gap: 4px;
+        }
+        .hero-status {
+            width: 70px;
+            background: #2a2a4a;
+            border: 2px solid #4a4a6a;
+            border-radius: 5px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .hero-status.selected {
+            border-color: #e94560;
+        }
+        .hero-status-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            margin-bottom: 3px;
+        }
+        .hero-hp-small {
+            width: 100%;
+            height: 6px;
+            background: #1a1a2e;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .hero-hp-fill {
+            height: 100%;
+            background: #4CAF50;
+        }
+        .skill-slots {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+        .skill-btn {
+            width: 65px;
+            height: 65px;
+            background: #2a2a4a;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #4a90e2;
+            text-align: center;
+        }
+        .skill-btn.ready {
+            background: #4a90e2;
+            color: white;
+        }
+        .skill-btn.cooldown {
+            opacity: 0.5;
+            border-color: #4a4a6a;
+            color: #888;
+        }
+
+        /* 전투 필드 유닛 */
+        .combat-zone-battle {
+            flex: 1;
+            background: linear-gradient(90deg, #2d4a3e 0%, #3d5a4e 20%, #4a6a5e 80%, #5a7a6e 100%);
+            position: relative;
+            display: flex;
+        }
+        .unit {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+        }
+        .unit.hero-unit {
+            background: #4a90e2;
+            border: 2px solid #6ab0ff;
+        }
+        .unit.enemy-unit {
+            background: #c41e3a;
+            border: 2px solid #e94560;
+        }
+        .barricade-unit {
+            position: absolute;
+            width: 35px;
+            height: 18px;
+            background: #8b4513;
+            border: 2px solid #a0522d;
+            border-radius: 3px;
+            font-size: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 전투 헤더 */
+        .battle-header {
+            padding: 6px 15px;
+            background: #1a1a3e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            border-bottom: 1px solid #4a4a6a;
+        }
+        .wave-info {
+            color: #e94560;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .wall-hp {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hp-bar {
+            width: 150px;
+            height: 16px;
+            background: #2a2a4a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .hp-fill {
+            width: 80%;
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        }
+
+        h3 {
+            text-align: center;
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 준비 단계 -->
+    <div>
+        <h3>준비 단계</h3>
+        <div class="screen">
+            <div class="screen-title">스테이지 1-3 | 병력과 바리케이드를 배치하세요</div>
+            <div class="battle-field">
+                <div class="wall-area">
+                    <div class="wall-weapon">발리<br>스타</div>
+                    <div class="wall-weapon">투석기</div>
+                    <div class="wall-weapon">마법<br>포대</div>
+                    <div style="font-size:8px; margin-top:5px;">성벽</div>
+                </div>
+                <div class="combat-zone">
+                    <!-- Row 1 -->
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                    <!-- Row 2: 바리케이드-기사-바리케이드 -->
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell barricade">목책</div><div class="grid-cell hero">기사</div><div class="grid-cell barricade">목책</div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell trap">함정</div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                    <!-- Row 3: 후방 궁수 -->
+                    <div class="grid-cell"></div><div class="grid-cell hero">궁수</div><div class="grid-cell"></div><div class="grid-cell barricade">목책</div><div class="grid-cell"></div><div class="grid-cell barricade">목책</div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                    <!-- Row 4 -->
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                    <!-- Row 5 -->
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                    <!-- Row 6: 후방 마법사 -->
+                    <div class="grid-cell"></div><div class="grid-cell hero">마법</div><div class="grid-cell"></div><div class="grid-cell barricade">목책</div><div class="grid-cell"></div><div class="grid-cell barricade">목책</div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                    <!-- Row 7: 바리케이드-기사-바리케이드, 후방 힐러 -->
+                    <div class="grid-cell"></div><div class="grid-cell hero">힐러</div><div class="grid-cell"></div><div class="grid-cell barricade">목책</div><div class="grid-cell hero">기사</div><div class="grid-cell barricade">목책</div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell trap">함정</div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                    <!-- Row 8 -->
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                </div>
+                <div class="spawn-area">
+                    <span class="spawn-arrow">←</span>
+                    <span>적</span>
+                    <span class="spawn-arrow">←</span>
+                </div>
+            </div>
+            <div class="bottom-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">영웅 선택</div>
+                    <div class="hero-slots">
+                        <div class="hero-slot selected">기사<br>Lv.30</div>
+                        <div class="hero-slot">궁수<br>Lv.25</div>
+                        <div class="hero-slot">마법사<br>Lv.28</div>
+                        <div class="hero-slot">힐러<br>Lv.22</div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="menu-section">
+                    <div class="menu-section-title">행동 타입</div>
+                    <div class="action-btns">
+                        <div class="action-btn active">방어</div>
+                        <div class="action-btn">공세</div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="menu-section">
+                    <div class="menu-section-title">바리케이드</div>
+                    <div class="barricade-slots">
+                        <div class="barricade-item">목책<br>x5</div>
+                        <div class="barricade-item">철조망<br>x3</div>
+                        <div class="barricade-item">함정<br>x2</div>
+                    </div>
+                </div>
+                <button class="start-btn">전투 시작</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전투 단계 -->
+    <div>
+        <h3>전투 단계</h3>
+        <div class="screen">
+            <div class="battle-header">
+                <div class="wave-info">웨이브 2/5</div>
+                <div style="font-size:11px;">스테이지 1-3</div>
+                <div class="wall-hp">
+                    성벽 HP
+                    <div class="hp-bar"><div class="hp-fill"></div></div>
+                    80%
+                </div>
+            </div>
+            <div class="combat-zone-battle">
+                <div class="wall-area">
+                    <div class="wall-weapon">발리<br>스타</div>
+                    <div class="wall-weapon">투석기</div>
+                    <div class="wall-weapon">마법<br>포대</div>
+                </div>
+                <div style="flex:1; position:relative;">
+                    <!-- 아군: 기사(탱커)는 바리케이드 사이, 원거리/서포터는 후방 -->
+                    <div class="unit hero-unit" style="left:130px; top:40px;">기사</div>
+                    <div class="unit hero-unit" style="left:60px; top:90px;">궁수</div>
+                    <div class="unit hero-unit" style="left:60px; top:180px;">마법</div>
+                    <div class="unit hero-unit" style="left:60px; top:250px;">힐러</div>
+                    <div class="unit hero-unit" style="left:130px; top:230px;">기사</div>
+
+                    <!-- 바리케이드: 기사 양옆에 배치 -->
+                    <div class="barricade-unit" style="left:95px; top:35px;">목책</div>
+                    <div class="barricade-unit" style="left:165px; top:35px;">목책</div>
+                    <div class="barricade-unit" style="left:95px; top:60px;">목책</div>
+                    <div class="barricade-unit" style="left:165px; top:60px;">목책</div>
+                    <div class="barricade-unit" style="left:95px; top:175px;">목책</div>
+                    <div class="barricade-unit" style="left:165px; top:175px;">목책</div>
+                    <div class="barricade-unit" style="left:95px; top:225px;">목책</div>
+                    <div class="barricade-unit" style="left:165px; top:225px;">목책</div>
+
+                    <!-- 적군 -->
+                    <div class="unit enemy-unit" style="left:400px; top:30px;">고블린</div>
+                    <div class="unit enemy-unit" style="left:450px; top:60px;">고블린</div>
+                    <div class="unit enemy-unit" style="left:500px; top:45px;">울프</div>
+                    <div class="unit enemy-unit" style="left:350px; top:130px;">오크</div>
+                    <div class="unit enemy-unit" style="left:420px; top:150px;">고블린</div>
+                    <div class="unit enemy-unit" style="left:480px; top:120px;">고블린</div>
+                    <div class="unit enemy-unit" style="left:380px; top:200px;">트롤</div>
+                    <div class="unit enemy-unit" style="left:450px; top:220px;">고블린</div>
+                    <div class="unit enemy-unit" style="left:520px; top:250px;">울프</div>
+                    <div class="unit enemy-unit" style="left:400px; top:270px;">고블린</div>
+                </div>
+                <div class="spawn-area">
+                    <span class="spawn-arrow">←</span>
+                    <span class="spawn-arrow">←</span>
+                    <span class="spawn-arrow">←</span>
+                </div>
+            </div>
+            <div class="battle-bottom-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">병력 상태 (터치로 선택/이동)</div>
+                    <div class="hero-status-slots">
+                        <div class="hero-status selected">
+                            <div class="hero-status-header">
+                                <span>기사</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="hero-hp-small"><div class="hero-hp-fill" style="width:75%"></div></div>
+                        </div>
+                        <div class="hero-status">
+                            <div class="hero-status-header">
+                                <span>궁수</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="hero-hp-small"><div class="hero-hp-fill" style="width:90%"></div></div>
+                        </div>
+                        <div class="hero-status">
+                            <div class="hero-status-header">
+                                <span>마법사</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="hero-hp-small"><div class="hero-hp-fill" style="width:100%"></div></div>
+                        </div>
+                        <div class="hero-status">
+                            <div class="hero-status-header">
+                                <span>힐러</span>
+                                <span>60%</span>
+                            </div>
+                            <div class="hero-hp-small"><div class="hero-hp-fill" style="width:60%; background:#FFA500;"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-slots">
+                    <div class="skill-btn ready">돌격<br>기사</div>
+                    <div class="skill-btn cooldown">연사<br>5s</div>
+                    <div class="skill-btn ready">파이어볼<br>마법사</div>
+                    <div class="skill-btn ready">힐<br>힐러</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
