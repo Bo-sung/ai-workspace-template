@@ -12,12 +12,10 @@ workers:
     host: 8eh1ndy0u.iptime.org
     user: user-pc
     port: 2224
-    wol_port: 9224
-    mac_address: "40:c2:ba:a4:38:82"  # 노트북 유선 이더넷 MAC 주소
-    os: windows
+    os: linux  # WSL2 Ubuntu (Windows OpenSSH default shell → bash.exe)
     transport: ssh
     runtime: ollama
-    python_cmd: python
+    python_cmd: python3
     ollama_url: http://127.0.0.1:11434
     models:
       - name: gemma4:e2b
@@ -31,8 +29,6 @@ workers:
     host: 8eh1ndy0u.iptime.org
     user: boseong
     port: 2222
-    wol_port: 9222
-    mac_address: "1c:f6:4c:5e:7d:df"  # Macmini 실제 MAC 주소
     os: macos
     transport: ssh
     runtime: ollama
@@ -55,3 +51,7 @@ workers:
         max_input_tokens: 4000
         max_output_tokens: 1000
         priority: 12
+
+policies:
+  exaone_session_approval: true   # true = 세션 단위 사전 승인 (ask.py가 자동 적용)
+                                  # false = --user-approved 명시 필수, 없으면 거부

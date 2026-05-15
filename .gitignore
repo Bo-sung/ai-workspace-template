@@ -23,3 +23,6 @@ Thumbs.db
 
 # Ignore Game Project Directory
 Project/
+
+# AI cache files
+.ai-cache/
