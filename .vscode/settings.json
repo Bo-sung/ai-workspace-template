@@ -1,3 +1,4 @@
 {
-    "claudeCode.preferredLocation": "sidebar"
+    "claudeCode.preferredLocation": "sidebar",
+    "python.defaultInterpreterPath": "${workspaceFolder}/.shared-ai-tools/venvs/ai-tools/Scripts/python.exe"
 }

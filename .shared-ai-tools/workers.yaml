@@ -1,0 +1,57 @@
+version: 1
+
+defaults:
+  timeout_sec: 240
+  num_ctx: 4096
+  temperature: 0.2
+  keep_alive: 0
+
+workers:
+  - id: laptop-gemma-e2b
+    enabled: true
+    host: 8eh1ndy0u.iptime.org
+    user: user-pc
+    port: 2224
+    wol_port: 9224
+    mac_address: "40:c2:ba:a4:38:82"  # 노트북 유선 이더넷 MAC 주소
+    os: windows
+    transport: ssh
+    runtime: ollama
+    python_cmd: python
+    ollama_url: http://127.0.0.1:11434
+    models:
+      - name: gemma4:e2b
+        tags: [local, light, docs, qa, summary, vision, fast]
+        max_input_tokens: 1500
+        max_output_tokens: 500
+        priority: 20
+
+  - id: macmini-worker
+    enabled: true
+    host: 8eh1ndy0u.iptime.org
+    user: boseong
+    port: 2222
+    wol_port: 9222
+    mac_address: "1c:f6:4c:5e:7d:df"  # Macmini 실제 MAC 주소
+    os: macos
+    transport: ssh
+    runtime: ollama
+    python_cmd: python3
+    ollama_url: http://127.0.0.1:11434
+    models:
+      - name: exaone3.5:7.8b
+        tags: [local, korean, docs, planning, meeting, release-notes]
+        requires_permission: true  # Non-Commercial License
+        max_input_tokens: 4000
+        max_output_tokens: 1000
+        priority: 10
+      - name: qwen3:4b
+        tags: [local, light, classify, git, summary]
+        max_input_tokens: 2000
+        max_output_tokens: 600
+        priority: 15
+      - name: qwen3:8b
+        tags: [local, docs, planning, qa, issue-draft]
+        max_input_tokens: 4000
+        max_output_tokens: 1000
+        priority: 12

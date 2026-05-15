@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "worker_router": {
+      "command": "H:/Git/Portpolio/FrontierBastion_plan/.shared-ai-tools/venvs/ai-tools/Scripts/python.exe",
+      "args": [
+        "H:/Git/Portpolio/FrontierBastion_plan/.shared-ai-tools/worker_router_mcp.py"
+      ]
+    },
+    "openai_light_workers": {
+      "command": "H:/Git/Portpolio/FrontierBastion_plan/.shared-ai-tools/venvs/ai-tools/Scripts/python.exe",
+      "args": [
+        "H:/Git/Portpolio/FrontierBastion_plan/.shared-ai-tools/openai_light_mcp.py"
+      ]
+    }
+  }
+}
