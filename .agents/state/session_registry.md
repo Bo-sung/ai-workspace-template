@@ -2,13 +2,19 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-16T21:20:00+09:00
+Last Updated: 2026-05-16T21:45:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | None | - | - | - | - | - | - |
+
+## Recent Completed Sessions (v2 residual)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260516-2130-worker-cli-v2-residual | INFRA + OPS/COORDINATION | v2 잔여 M/L/H/N/E/S — stats jsonl, --retry, --trim, --with-header, batch --parallel, batch --auto-index; verified single-call (retry+trim+header+peek) and batch parallel=2 + auto-index | 2026-05-16T21:30:00+09:00 | 2026-05-16T21:45:00+09:00 | Completed; parallel index의 status_line 컬럼이 thread간 stdout swap으로 약간 섞임 — known limitation 기록; Roles released |
 
 ## Recent Completed Sessions (v2 templates)
 
