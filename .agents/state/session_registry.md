@@ -2,13 +2,44 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-16T23:00:00+09:00
+Last Updated: 2026-05-17T12:00:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| None | - | - | - | - | - | - |
+| Antigravity | antigravity-20260517-0500-doc-refactor-pilot-drone | GAME_DESIGN | 파일럿+드론 부대 구조 공식화 — 11개 문서 리팩터링 완료 | 2026-05-17T05:00:00+09:00 | 2026-05-17T05:00:00+09:00 | Completed; Role released |
+| Claude | claude-20260517-1200-pilot-system-rename | GAME_DESIGN | 영웅 시스템.md → 파일럿 시스템.md rename + 영웅/ → 파일럿/ + cross-link 전체 갱신 | 2026-05-17T12:00:00+09:00 | 2026-05-17T12:00:00+09:00 | Active |
+
+## Recent Completed Sessions (glossary v2)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260517-1100-glossary-sf-realign | GAME_DESIGN | 용어 사전 v2 SF 재정렬. inner commit 478d3ae | 2026-05-17T11:00:00+09:00 | 2026-05-17T11:30:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (overview SF realign)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260517-1000-overview-sf-realign | LORE_ART | Overview docs 01~05 SF 재정렬 + 기획서 원본 _legacy/ 백업. inner commit 4d0865f | 2026-05-17T10:00:00+09:00 | 2026-05-17T10:30:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (commit signature guard)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260517-0500-ops-commit-signature-guard | OPS/COORDINATION | Commit signature 재발 방지 — commit_policy.md 강화 (precedence + forbidden patterns + 두 repo Git Locations), pre_commit.md/commit_write.md stale path 수정 + hook 활성화 확인 단계 추가, .agents/git-hooks/commit-msg 신규 (POSIX sh, sh -n 통과, reject/accept 수동 검증 PASS), AGENTS/CLAUDE/GEMINI.md에 짧은 경고 추가 | 2026-05-17T05:00:00+09:00 | 2026-05-17T05:30:00+09:00 | Completed; Role released; Codex follow-up activated hooks in both repos |
+
+## Recent Completed Sessions (DATA_TECH SF identifiers)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260517-0300-data-tech-sf-identifiers | DATA_TECH | DATA_TECH SF Re-theme — 4개 파일 용어 전환 + 식별자 결정 섹션 추가. commit 905dad5 | 2026-05-17T03:00:00+09:00 | 2026-05-17T04:00:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (Phase B)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260517-0000-game-design-sf-retheme-phaseB | GAME_DESIGN | SF Re-theme Phase B — 21개 시스템 문서 판타지 → SF 용어 전환 완료 (파일럿/식민지/총독부/크레딧/레어메탈/방벽/에너지 포대) | 2026-05-17T00:00:00+09:00 | 2026-05-17T02:00:00+09:00 | Completed; Role released |
 
 ## Recent Completed Sessions (v2.3 measurement)
 

@@ -3,7 +3,9 @@
 ## Current State
 
 - Role free. Next session to claim should register in `.agents/state/session_registry.md` before any edit.
-- **Phase A 완료** (2026-05-16): SF 용어 매핑 확정 + Hub 5개 파일 적용 완료. 매핑 표는 `Project/FrontierBastion_plan/용어 사전.md` §SF 리테마 용어 매핑 참조.
+- **Phase A 완료** (2026-05-16): SF 용어 매핑 확정 + Hub 5개 파일 적용 완료.
+- **Phase B 완료** (2026-05-17): 21개 시스템 문서 SF 용어 전환 완료. 게임 개요, 전투 메카닉, 스탯/스킬/적/장비/재화/진행/게임모드 + 영웅·영지 서브폴더 전체. commit: `7eab547`
+- **Glossary v2 normalized** (2026-05-17): 용어 사전 v2 SF 재정렬 완료. commit: `478d3ae`
 - All system documents live under `Project/FrontierBastion_plan/시스템/`. The earlier `.agents/rules/module_permissions.md` rooted them at the repo root — that has been corrected on 2026-05-15.
 
 ## Active Mandate: SF Re-theme
@@ -14,7 +16,11 @@ The `시스템/` document set was migrated from the legacy `FantasyTowerDeffence
 
 용어 사전 매핑 확정 + Hub 5개 파일(전투 코어, 부대 카드 시스템, 파일럿 시스템, 핵심 컨텐츠, 스테이지 시스템) 적용 완료.
 
-### Phase B — 다음 작업 (이전 Phase A 계획 유지) Suggested mappings to validate:
+### Phase B — ✅ 완료 (2026-05-17)
+
+21개 파일 SF 용어 전환 완료. 의도적 잔류: 마법사(역할명), 마법체(종족 분류 race=magic DATA_TECH 협의 필요), 파일명 내 `영웅`(링크 경로).
+
+### Phase C — 다음 작업 후보 Suggested mappings to validate:
    - 영웅 → 파일럿 (Pilot)
    - 영지 → 식민지 / 전초기지 (Colony / Outpost)
    - 마나 → 에너지 / 지령 포인트 (Energy / Command Points) — pick one and stay consistent
@@ -61,4 +67,4 @@ After Phase A lands and the glossary is stable:
 
 ## Last Updated
 
-2026-05-16T19:30:00+09:00 by `claude-20260516-1700-game-design-sf-retheme` (GAME_DESIGN).
+2026-05-17T02:00:00+09:00 by `claude-20260517-0000-game-design-sf-retheme-phaseB` (GAME_DESIGN).
