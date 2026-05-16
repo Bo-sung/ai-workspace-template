@@ -2,13 +2,19 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-16T21:45:00+09:00
+Last Updated: 2026-05-16T23:00:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | None | - | - | - | - | - | - |
+
+## Recent Completed Sessions (v2.3 measurement)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260516-2200-worker-batch-measure-A | OPS/COORDINATION + INFRA | Worker batch 실측 (Hub 5 한 줄 요약) + v2.3 patches (SSH stdin pipe + defaults.timeout_sec). 5/5 통과, ~98% main-session token saving 실증 | 2026-05-16T22:00:00+09:00 | 2026-05-16T23:00:00+09:00 | Completed; Roles released |
 
 ## Recent Completed Sessions (v2 residual)
 

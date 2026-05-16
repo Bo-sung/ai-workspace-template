@@ -155,6 +155,31 @@ Worker Infrastructure transition (MCP → CLI) is COMPLETE. Next track: laptop-g
 - `race` 컬럼 → SF 상응 식별자 검토
 - 파일 경로 rename (영웅 시스템.md → 파일럿 시스템.md 등) — 사용자 확인 후 진행
 
+## Worker batch 실측 + v2.3 인프라 보강 (2026-05-16 evening)
+
+**시나리오**: Hub 5개 시스템 문서를 워커에 일괄 한 줄 요약. Phase A의 SF 용어 적용 결과가 요약에 자연스럽게 반영(파일럿/드론 부대/식민지 등). 측정 데이터로 토큰 절감 효과 정량 검증.
+
+**1차 시도 실패와 v2.3 패치**:
+- 첫 batch (parallel=2)에서 큰 input-file(10KB+)이 SSH 명령 한 줄로 escape돼 Windows OpenSSH 명령 길이 한계 초과 → 1/5만 통과, 그 후 macmini측 차단으로 4/5 fail.
+- **v2.3 patch 1**: `_call_remote_ollama`가 페이로드를 SSH stdin으로 파이프하도록 변경 (`curl --data-binary @-`). 명령 라인 길이는 호출당 ~200자 고정.
+- **v2.3 patch 2**: 하드코딩 timeout 120s → `defaults.timeout_sec`(240) 사용. 큰 입력은 처리 시간 ~80s까지 소요.
+- 재실행 (parallel=1): 5/5 통과.
+
+**실측 토큰 회계** (5 hub × qwen3:8b):
+
+| 항목 | 값 |
+| --- | --- |
+| 워커 측 합계 tok_in | 18,458 |
+| 워커 측 합계 tok_out | 184 |
+| 워커 측 처리 시간 | 199.3s |
+| **메인 세션 소비** (batch 명령 + 5 stdout 라인 + summary) | **~330 토큰** |
+| 메인 세션 직접 처리 baseline (가설) | ~18,658 토큰 (입력 5건 컨텍스트 진입 + 응답) |
+| **절감률** | **약 98% (≈56배)** |
+
+**결론**: 큰 입력 + 작은 출력 패턴에서 절감 효과가 결정적. SF Phase B 같은 시스템 문서 다수 처리 시 정상 운영 패턴. v2 측정에서 추정했던 60~70% 평균 절감보다 훨씬 큰 효과 — baseline이 입력 본문 진입을 포함하기 때문.
+
+산출물: `.ai-cache/20260516-175*-*.md` 5개 (각 파일에 `--with-header` frontmatter), `.ai-cache/20260516-175848-batch-index.md`(retry batch index).
+
 ---
 
 ## Next Work
