@@ -69,6 +69,18 @@ YAML 형식 (둘 다 허용):
 - 같은 종류의 작은 task(분류·라벨링·간단 요약) 5~10개를 묶어 배치로 실행.
 - Orchestrator는 명령 한 줄만 작성. 결과는 각 task별 출력 파일로 분리됨.
 - 보일러플레이트 절감 효과는 호출 수 N에 비례 — 5개 묶으면 한 호출 대비 약 80×(N−1) 토큰 절감.
+- `--parallel K`로 K개 동시 실행 (지연 시간 절감, 토큰 영향 없음). 출력은 항목별 캡처 후 `[i/N]` 프리픽스로 식별.
+- `--index-file <path>` 또는 `--auto-index`로 batch 종료 시 모든 항목의 상태·출력경로·peek를 한 markdown 표로 저장. Orchestrator가 결과 검증 시 개별 파일을 일일이 열지 않아도 됨.
+
+### 추가 운영 옵션
+
+- **`--retry N`** — SSH/Ollama 일시적 실패에 N회 재시도 (지수 백오프 1s/2s/4s). 기본값은 `workers.yaml` `defaults.retry`. 일시 네트워크 흔들림 흡수용.
+- **`--trim` / `--no-trim`** — 워커 응답에서 명백한 군더더기 prefix/suffix 제거 (`Sure, here's…`, `Let me know…`, `다음은…`, `결과:` 등). 기본 비활성(`defaults.trim: false`); opt-in. 응답당 10~50 토큰 절감, 다만 코드 펜스 보존 등 보수적으로 동작.
+- **`--with-header`** — 출력 파일 상단에 YAML frontmatter (`worker / model / ts / tok_in / tok_out / chars / duration_ms / task_hint`) 자동 삽입. 사후 검토·통계에 유용. 결과 본문 내용은 변경 없음.
+
+### 호출 통계 누적 (자동)
+
+`defaults.stats_log: true`(기본)면 ask.py가 호출마다 `.ai-cache/stats.jsonl`에 한 줄씩 append. 필드: `ts / worker / model / tok_in / tok_out / chars / duration_ms / status / attempts / task_hint`. 운영자가 `jq` 또는 `wc -l`로 누적 토큰 사용량·실패율·평균 지연을 즉시 분석 가능. 끄려면 `defaults.stats_log: false`.
 
 ## Token-efficiency rules
 

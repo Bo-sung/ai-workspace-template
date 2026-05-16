@@ -4,9 +4,12 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -14,6 +17,70 @@ import yaml
 WORKERS_YAML = Path(__file__).parent.parent / "workers.yaml"
 REPO_ROOT = WORKERS_YAML.parent.parent  # .shared-ai-tools/.. = repo root
 TEMPLATES_DIR = WORKERS_YAML.parent / "prompts" / "templates"
+
+
+# --- response cleanup (H: --trim) -------------------------------------------------
+_TRIM_PREFIX_PATTERNS = [
+    re.compile(r"^(sure|of course|certainly|alright|okay)[,.!]?\s*", re.IGNORECASE),
+    re.compile(r"^here(?:'s| is| are)[^.\n]*[:.]\s*", re.IGNORECASE),
+    re.compile(r"^(다음은|결과는|요약하면|아래는)[^.\n]*[:.]?\s*"),
+    re.compile(r"^(요약|결과|답변|응답)\s*[:：]\s*"),
+]
+_TRIM_SUFFIX_PATTERNS = [
+    re.compile(r"\n*let me know.*$", re.IGNORECASE | re.DOTALL),
+    re.compile(r"\n*if you (have|need) (any )?(more |further )?(questions?|help).*$", re.IGNORECASE | re.DOTALL),
+    re.compile(r"\n*(도움이 되었|추가 (질문|문의)|더 필요).*$"),
+]
+
+
+def _trim_response(text):
+    """Strip common boilerplate prefixes/suffixes from worker responses.
+    Conservative: only well-known patterns; preserves intentional content."""
+    if not text:
+        return text
+    s = text.strip()
+    # Unwrap if entire response is a single fenced code block with no language
+    if s.startswith("```") and s.endswith("```"):
+        inner = s[3:-3].strip()
+        if "\n```" not in inner:  # no nested fences
+            s = inner
+    for pat in _TRIM_PREFIX_PATTERNS:
+        s = pat.sub("", s, count=1)
+    for pat in _TRIM_SUFFIX_PATTERNS:
+        s = pat.sub("", s)
+    return s.strip()
+
+
+# --- stats logger (M) -------------------------------------------------------------
+def _log_call_stats(defaults, record):
+    """Append one JSON line to .ai-cache/stats.jsonl. Silent on error."""
+    if not defaults.get("stats_log", True):
+        return
+    try:
+        log_dir = _resolve_output_dir(defaults)
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_path = log_dir / "stats.jsonl"
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception:
+        pass  # never let logging break a call
+
+
+# --- frontmatter header (N: --with-header) ----------------------------------------
+def _make_header(worker_id, model, usage, chars, duration_ms, task):
+    task_hint = (task or "").splitlines()[0][:120] if task else ""
+    return (
+        "---\n"
+        f"worker: {worker_id}\n"
+        f"model: {model}\n"
+        f"ts: {datetime.now(timezone.utc).isoformat()}\n"
+        f"tok_in: {usage.get('in', 0)}\n"
+        f"tok_out: {usage.get('out', 0)}\n"
+        f"chars: {chars}\n"
+        f"duration_ms: {duration_ms}\n"
+        f"task_hint: {json.dumps(task_hint, ensure_ascii=False)}\n"
+        "---\n\n"
+    )
 
 
 def _resolve_output_dir(defaults):
@@ -120,6 +187,25 @@ def _call_remote_ollama(
         "out": res.get("eval_count", 0),
     }
     return content, usage
+
+
+def _call_with_retry(worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens, retry):
+    """Wrap _call_remote_ollama with N retries on transient SSH/Ollama failures.
+    Exponential backoff: 1s, 2s, 4s, ... Returns (content, usage, attempts)."""
+    last_exc = None
+    for attempt in range(retry + 1):
+        try:
+            content, usage = _call_remote_ollama(
+                worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens
+            )
+            return content, usage, attempt + 1
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, RuntimeError) as e:
+            last_exc = e
+            if attempt < retry:
+                wait = 2 ** attempt  # 1, 2, 4, ...
+                print(f"warning: call failed (attempt {attempt + 1}/{retry + 1}): {e}; retrying in {wait}s", file=sys.stderr)
+                time.sleep(wait)
+    raise last_exc
 
 
 def cmd_list(args):
@@ -318,11 +404,28 @@ def cmd_call(args):
         else selected_model.get("max_output_tokens", 500)
     )
 
+    retry = args.retry if args.retry is not None else int(defaults.get("retry", 0))
+    do_trim = args.trim if args.trim is not None else bool(defaults.get("trim", False))
+
+    t_start = time.time()
     try:
-        result, usage = _call_remote_ollama(
-            selected_worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens
+        result, usage, attempts = _call_with_retry(
+            selected_worker, model_name, task, input_text,
+            num_ctx, temperature, max_output_tokens, retry,
         )
     except Exception as e:
+        duration_ms = int((time.time() - t_start) * 1000)
+        _log_call_stats(defaults, {
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "worker": selected_worker["id"],
+            "model": model_name,
+            "tok_in": 0,
+            "tok_out": 0,
+            "chars": 0,
+            "duration_ms": duration_ms,
+            "status": "err",
+            "error": str(e)[:200],
+        })
         if args.json_out:
             print(
                 json.dumps(
@@ -339,11 +442,34 @@ def cmd_call(args):
             print(f"error: {e}", file=sys.stderr)
         sys.exit(1)
 
+    duration_ms = int((time.time() - t_start) * 1000)
+    if do_trim:
+        result = _trim_response(result)
+    if attempts > 1:
+        warnings.append(f"recovered after {attempts} attempts")
+
+    _log_call_stats(defaults, {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "worker": selected_worker["id"],
+        "model": model_name,
+        "tok_in": usage.get("in", 0),
+        "tok_out": usage.get("out", 0),
+        "chars": len(result),
+        "duration_ms": duration_ms,
+        "status": "ok",
+        "attempts": attempts,
+        "task_hint": (task or "").splitlines()[0][:80],
+    })
+
     if args.output_file:
         out_path = Path(args.output_file)
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(result, encoding="utf-8")
         chars = len(result)
+        if getattr(args, "with_header", False):
+            header = _make_header(selected_worker["id"], model_name, usage, chars, duration_ms, task)
+            out_path.write_text(header + result, encoding="utf-8")
+        else:
+            out_path.write_text(result, encoding="utf-8")
         if args.json_out:
             print(
                 json.dumps(
@@ -391,11 +517,59 @@ def cmd_call(args):
         print(result, end="")
 
 
+def _build_call_args(item):
+    """Build a Namespace mirroring 'call' args from a batch YAML item."""
+    return argparse.Namespace(
+        cmd="call",
+        worker=item.get("worker"),
+        tags=item.get("tags"),
+        model=item.get("model"),
+        task=item.get("task"),
+        task_file=item.get("task_file"),
+        task_template=item.get("task_template"),
+        input=item.get("input", ""),
+        input_file=item.get("input_file"),
+        output_file=item.get("output_file"),
+        auto_output=item.get("auto_output", True),  # batch default: auto-output ON
+        max_output_tokens=item.get("max_output_tokens"),
+        num_ctx=item.get("num_ctx"),
+        temperature=item.get("temperature"),
+        user_approved=item.get("user_approved", False),
+        peek=item.get("peek", 0),
+        retry=item.get("retry"),
+        trim=item.get("trim"),
+        with_header=item.get("with_header", False),
+        json_out=item.get("json", False),
+    )
+
+
+def _run_batch_item(idx, total, item):
+    """Run one batch item in isolation, capturing stdout/stderr for later print.
+    Returns (idx, status, stdout_str, stderr_str, item_meta)."""
+    import io as _io
+    call_args = _build_call_args(item)
+    buf_out = _io.StringIO()
+    buf_err = _io.StringIO()
+    saved_out, saved_err = sys.stdout, sys.stderr
+    sys.stdout, sys.stderr = buf_out, buf_err
+    status = "ok"
+    try:
+        cmd_call(call_args)
+    except SystemExit as e:
+        if e.code and e.code != 0:
+            status = f"exit:{e.code}"
+    except Exception as e:
+        status = f"err:{type(e).__name__}"
+        print(f"error: {e}", file=sys.stderr)
+    finally:
+        sys.stdout, sys.stderr = saved_out, saved_err
+    return idx, total, status, buf_out.getvalue(), buf_err.getvalue(), call_args
+
+
 def cmd_batch(args):
     """Run a list of call items defined in a YAML file. Each item is a dict whose keys
-    mirror the 'call' subcommand arguments (worker, model, tags, task, input, input_file,
-    output_file, auto_output, max_output_tokens, num_ctx, temperature, user_approved, peek).
-    Items run sequentially; one failure does not stop the rest unless --fail-fast is set.
+    mirror the 'call' subcommand arguments. Sequential by default; --parallel K runs
+    K items concurrently (output of each item is captured and printed atomically).
     """
     batch_path = Path(args.batch_file)
     if not batch_path.exists():
@@ -403,53 +577,121 @@ def cmd_batch(args):
         sys.exit(2)
     items = yaml.safe_load(batch_path.read_text(encoding="utf-8"))
     if not isinstance(items, list):
-        # also accept {"calls": [...]} top-level
         if isinstance(items, dict) and "calls" in items:
             items = items["calls"]
         else:
             print("error: batch file must be a YAML list (or {calls: [...]})", file=sys.stderr)
             sys.exit(2)
 
+    config = load_workers()
+    defaults = config.get("defaults", {})
+    parallel = args.parallel if args.parallel is not None else int(defaults.get("parallel", 1))
+    parallel = max(1, parallel)
+
     total = len(items)
     failures = 0
-    for i, item in enumerate(items, start=1):
-        # Build a Namespace mirroring call's args, filling defaults for anything omitted.
-        call_args = argparse.Namespace(
-            cmd="call",
-            worker=item.get("worker"),
-            tags=item.get("tags"),
-            model=item.get("model"),
-            task=item.get("task"),
-            task_file=item.get("task_file"),
-            task_template=item.get("task_template"),
-            input=item.get("input", ""),
-            input_file=item.get("input_file"),
-            output_file=item.get("output_file"),
-            auto_output=item.get("auto_output", True),  # batch default: auto-output ON
-            max_output_tokens=item.get("max_output_tokens"),
-            num_ctx=item.get("num_ctx"),
-            temperature=item.get("temperature"),
-            user_approved=item.get("user_approved", False),
-            peek=item.get("peek", 0),
-            json_out=item.get("json", False),
-        )
-        print(f"--- batch {i}/{total} ---", file=sys.stderr)
-        try:
-            cmd_call(call_args)
-        except SystemExit as e:
-            if e.code and e.code != 0:
-                failures += 1
-                if args.fail_fast:
-                    print(f"error: stopping at batch item {i} (--fail-fast)", file=sys.stderr)
-                    sys.exit(e.code)
-        except Exception as e:
-            failures += 1
-            print(f"error: batch item {i} raised: {e}", file=sys.stderr)
-            if args.fail_fast:
-                sys.exit(1)
+    index_records = []  # for --index-file
+    print(f"--- batch start: {total} items, parallel={parallel} ---", file=sys.stderr)
 
+    if parallel == 1:
+        # Sequential — keep print streaming live (no buffering surprise).
+        for i, item in enumerate(items, start=1):
+            print(f"--- batch {i}/{total} ---", file=sys.stderr)
+            call_args = _build_call_args(item)
+            try:
+                # Capture only the stdout status line for index purposes
+                import io as _io
+                buf = _io.StringIO()
+                saved = sys.stdout
+                sys.stdout = _Tee(saved, buf)
+                try:
+                    cmd_call(call_args)
+                finally:
+                    sys.stdout = saved
+                index_records.append({"idx": i, "status": "ok", "stdout": buf.getvalue().strip(), "out": call_args.output_file})
+            except SystemExit as e:
+                if e.code and e.code != 0:
+                    failures += 1
+                    index_records.append({"idx": i, "status": f"exit:{e.code}", "out": call_args.output_file})
+                    if args.fail_fast:
+                        print(f"error: stopping at batch item {i} (--fail-fast)", file=sys.stderr)
+                        sys.exit(e.code)
+                else:
+                    index_records.append({"idx": i, "status": "ok", "out": call_args.output_file})
+            except Exception as e:
+                failures += 1
+                print(f"error: batch item {i} raised: {e}", file=sys.stderr)
+                index_records.append({"idx": i, "status": f"err:{type(e).__name__}", "out": call_args.output_file})
+                if args.fail_fast:
+                    sys.exit(1)
+    else:
+        # Parallel — capture per-item output, print after each completes.
+        with ThreadPoolExecutor(max_workers=parallel) as pool:
+            futures = {pool.submit(_run_batch_item, i, total, item): i for i, item in enumerate(items, start=1)}
+            for fut in as_completed(futures):
+                idx, _t, status, out_s, err_s, call_args = fut.result()
+                tag = f"[{idx}/{total}]"
+                if err_s:
+                    for line in err_s.splitlines():
+                        print(f"{tag} {line}", file=sys.stderr)
+                if out_s:
+                    for line in out_s.splitlines():
+                        print(f"{tag} {line}")
+                if status != "ok":
+                    failures += 1
+                    if args.fail_fast:
+                        print(f"error: --fail-fast triggered by item {idx}", file=sys.stderr)
+                        # Cancel remaining and exit
+                        for f in futures:
+                            f.cancel()
+                        _write_batch_index(args, index_records, total, failures, defaults)
+                        sys.exit(1)
+                index_records.append({"idx": idx, "status": status, "stdout": out_s.strip(), "out": call_args.output_file})
+
+    _write_batch_index(args, index_records, total, failures, defaults)
     print(f"--- batch complete: {total - failures}/{total} ok ---", file=sys.stderr)
     sys.exit(1 if failures else 0)
+
+
+def _write_batch_index(args, index_records, total, failures, defaults):
+    """Emit a markdown index file summarizing batch results (if requested)."""
+    if not getattr(args, "index_file", None) and not getattr(args, "auto_index", False):
+        return
+    if getattr(args, "auto_index", False) and not getattr(args, "index_file", None):
+        ts = time.strftime("%Y%m%d-%H%M%S")
+        args.index_file = str(_resolve_output_dir(defaults) / f"{ts}-batch-index.md")
+    out_path = Path(args.index_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f"# Batch Index — {datetime.now(timezone.utc).isoformat()}",
+        "",
+        f"total: {total}, ok: {total - failures}, failed: {failures}",
+        "",
+        "| # | status | output | status line |",
+        "| --- | --- | --- | --- |",
+    ]
+    # Sort by idx for readability (parallel completion is out-of-order)
+    for rec in sorted(index_records, key=lambda r: r.get("idx", 0)):
+        idx = rec.get("idx", "?")
+        status = rec.get("status", "?")
+        out = rec.get("out") or "-"
+        stdout_line = (rec.get("stdout") or "").splitlines()[0][:200] if rec.get("stdout") else "-"
+        lines.append(f"| {idx} | {status} | `{out}` | `{stdout_line}` |")
+    out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"--- batch index written: {out_path} ---", file=sys.stderr)
+
+
+class _Tee:
+    """Tee a stream to two underlying writables."""
+    def __init__(self, a, b):
+        self.a, self.b = a, b
+    def write(self, data):
+        self.a.write(data)
+        self.b.write(data)
+        return len(data)
+    def flush(self):
+        self.a.flush()
+        self.b.flush()
 
 
 def main():
@@ -465,11 +707,30 @@ def main():
     sub.add_parser("health", help="Check health of all enabled workers via SSH")
 
     batch_p = sub.add_parser(
-        "batch", help="Run multiple 'call' items from a YAML file sequentially"
+        "batch", help="Run multiple 'call' items from a YAML file (sequential or parallel)"
     )
     batch_p.add_argument("--batch-file", dest="batch_file", required=True, help="Path to batch YAML")
     batch_p.add_argument(
         "--fail-fast", dest="fail_fast", action="store_true", help="Stop on first failure"
+    )
+    batch_p.add_argument(
+        "--parallel",
+        type=int,
+        default=None,
+        metavar="K",
+        help="Run up to K items concurrently. Default: workers.yaml defaults.parallel",
+    )
+    batch_p.add_argument(
+        "--index-file",
+        dest="index_file",
+        metavar="PATH",
+        help="Write a markdown index of all items + statuses to PATH",
+    )
+    batch_p.add_argument(
+        "--auto-index",
+        dest="auto_index",
+        action="store_true",
+        help="Auto-generate index file under defaults.output_dir (if --index-file not set)",
     )
 
     call_p = sub.add_parser("call", help="Execute a task on a remote worker")
@@ -511,6 +772,32 @@ def main():
         default=0,
         metavar="N",
         help="With --output-file: append first N chars of result to stdout status line",
+    )
+    call_p.add_argument(
+        "--retry",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Retry N times on SSH/Ollama transient errors (exp. backoff). Default: workers.yaml defaults.retry",
+    )
+    call_p.add_argument(
+        "--trim",
+        dest="trim",
+        action="store_true",
+        default=None,
+        help="Strip boilerplate prefixes/suffixes from worker response",
+    )
+    call_p.add_argument(
+        "--no-trim",
+        dest="trim",
+        action="store_false",
+        help="Disable trim heuristic for this call",
+    )
+    call_p.add_argument(
+        "--with-header",
+        dest="with_header",
+        action="store_true",
+        help="Prepend YAML frontmatter (worker/model/tokens/timing/ts) to output file",
     )
     call_p.add_argument(
         "--json",

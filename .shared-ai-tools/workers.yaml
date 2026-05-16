@@ -6,6 +6,10 @@ defaults:
   temperature: 0.2
   keep_alive: 0
   output_dir: .ai-cache   # 상대 경로면 repo root 기준. --auto-output에서 사용
+  retry: 0                # SSH/Ollama 호출 실패 시 재시도 횟수 (지수 백오프). 0 = 비활성
+  parallel: 1             # batch 동시 실행 수. 1 = 순차
+  trim: false             # 응답에 trim 휴리스틱 적용 여부 (default off — opt-in)
+  stats_log: true         # 호출별 통계를 .ai-cache/stats.jsonl에 기록
 
 workers:
   - id: laptop-gemma-e2b
