@@ -5,6 +5,7 @@ defaults:
   num_ctx: 4096
   temperature: 0.2
   keep_alive: 0
+  output_dir: .ai-cache   # 상대 경로면 repo root 기준. --auto-output에서 사용
 
 workers:
   - id: laptop-gemma-e2b

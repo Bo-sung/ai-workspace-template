@@ -13,7 +13,7 @@
 python <repo>/.shared-ai-tools/venvs/ai-tools/Scripts/python.exe <repo>/.shared-ai-tools/cli/ask.py <subcommand> ...
 ```
 
-서브커맨드: `list` / `health` / `call`
+서브커맨드: `list` / `health` / `call` / `batch`
 
 대표 사용:
 ```
@@ -27,6 +27,33 @@ stdout 상태 라인 형식 (with `--output-file`):
 OK [worker_id/model] (tok in:N out:N) Mc → <path> | <peek text>
 ```
 stdout 직접 결과 (without `--output-file`): 결과 본문이 stdout, 토큰 사용량은 stderr.
+
+`--auto-output` 옵션을 쓰면 `--output-file`을 명시하지 않아도 ask.py가 `workers.yaml`의 `defaults.output_dir`(기본 `.ai-cache/`) 아래에 `YYYYMMDD-HHMMSS-<task-hash>.md` 형식으로 자동 생성한다. Orchestrator는 매 호출마다 경로를 직접 짜지 않아도 되고, 경로 인자 boilerplate가 줄어든다.
+
+### Batch 호출 (`ask.py batch --batch-file <yaml>`)
+
+여러 task를 한 번의 명령으로 묶어 실행한다. 호출별 boilerplate(파이썬 진입점 풀패스 + 인자 키)가 명령 한 번으로 압축된다. 호출 사이에 워커 노드의 keep-alive를 활용하면 모델 로드 비용도 절감.
+
+YAML 형식 (둘 다 허용):
+```yaml
+- task: "..."
+  tags: docs,summary
+  input_file: src1.md
+  max_output_tokens: 200
+- task: "..."
+  worker: macmini-worker
+  model: qwen3:4b
+  input: "..."
+  peek: 80
+```
+또는 `{calls: [...]}` 래핑.
+
+기본값: `auto_output: true` (배치 항목엔 명시 안 하면 자동 출력 경로). `--fail-fast`로 첫 실패 시 즉시 중단 가능.
+
+운영 패턴:
+- 같은 종류의 작은 task(분류·라벨링·간단 요약) 5~10개를 묶어 배치로 실행.
+- Orchestrator는 명령 한 줄만 작성. 결과는 각 task별 출력 파일로 분리됨.
+- 보일러플레이트 절감 효과는 호출 수 N에 비례 — 5개 묶으면 한 호출 대비 약 80×(N−1) 토큰 절감.
 
 ## Token-efficiency rules
 

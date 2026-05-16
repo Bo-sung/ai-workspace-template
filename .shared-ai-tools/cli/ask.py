@@ -1,15 +1,33 @@
 #!/usr/bin/env python3
 """ask.py — CLI interface for remote Ollama workers defined in workers.yaml."""
 import argparse
+import hashlib
 import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import yaml
 
 WORKERS_YAML = Path(__file__).parent.parent / "workers.yaml"
+REPO_ROOT = WORKERS_YAML.parent.parent  # .shared-ai-tools/.. = repo root
+
+
+def _resolve_output_dir(defaults):
+    """Resolve defaults.output_dir to an absolute Path; default to repo_root/.ai-cache."""
+    raw = defaults.get("output_dir", ".ai-cache")
+    p = Path(raw)
+    return p if p.is_absolute() else (REPO_ROOT / p)
+
+
+def _auto_output_path(task, output_dir):
+    """Generate a unique output file under output_dir from task hash + timestamp."""
+    ts = time.strftime("%Y%m%d-%H%M%S")
+    task_slug = hashlib.sha1(task.encode("utf-8")).hexdigest()[:8]
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir / f"{ts}-{task_slug}.md"
 
 SYSTEM_PROMPT = """You are a small remote local LLM worker used by Gemini CLI or Codex.
 
@@ -204,6 +222,10 @@ def cmd_call(args):
     elif args.input:
         input_text = args.input
 
+    # --auto-output: generate output path under defaults.output_dir
+    if getattr(args, "auto_output", False) and not args.output_file:
+        args.output_file = str(_auto_output_path(task, _resolve_output_dir(defaults)))
+
     warnings = []
     selected_worker = None
     selected_model = None
@@ -356,6 +378,66 @@ def cmd_call(args):
         print(result, end="")
 
 
+def cmd_batch(args):
+    """Run a list of call items defined in a YAML file. Each item is a dict whose keys
+    mirror the 'call' subcommand arguments (worker, model, tags, task, input, input_file,
+    output_file, auto_output, max_output_tokens, num_ctx, temperature, user_approved, peek).
+    Items run sequentially; one failure does not stop the rest unless --fail-fast is set.
+    """
+    batch_path = Path(args.batch_file)
+    if not batch_path.exists():
+        print(f"error: batch file not found: {batch_path}", file=sys.stderr)
+        sys.exit(2)
+    items = yaml.safe_load(batch_path.read_text(encoding="utf-8"))
+    if not isinstance(items, list):
+        # also accept {"calls": [...]} top-level
+        if isinstance(items, dict) and "calls" in items:
+            items = items["calls"]
+        else:
+            print("error: batch file must be a YAML list (or {calls: [...]})", file=sys.stderr)
+            sys.exit(2)
+
+    total = len(items)
+    failures = 0
+    for i, item in enumerate(items, start=1):
+        # Build a Namespace mirroring call's args, filling defaults for anything omitted.
+        call_args = argparse.Namespace(
+            cmd="call",
+            worker=item.get("worker"),
+            tags=item.get("tags"),
+            model=item.get("model"),
+            task=item.get("task"),
+            task_file=item.get("task_file"),
+            input=item.get("input", ""),
+            input_file=item.get("input_file"),
+            output_file=item.get("output_file"),
+            auto_output=item.get("auto_output", True),  # batch default: auto-output ON
+            max_output_tokens=item.get("max_output_tokens"),
+            num_ctx=item.get("num_ctx"),
+            temperature=item.get("temperature"),
+            user_approved=item.get("user_approved", False),
+            peek=item.get("peek", 0),
+            json_out=item.get("json", False),
+        )
+        print(f"--- batch {i}/{total} ---", file=sys.stderr)
+        try:
+            cmd_call(call_args)
+        except SystemExit as e:
+            if e.code and e.code != 0:
+                failures += 1
+                if args.fail_fast:
+                    print(f"error: stopping at batch item {i} (--fail-fast)", file=sys.stderr)
+                    sys.exit(e.code)
+        except Exception as e:
+            failures += 1
+            print(f"error: batch item {i} raised: {e}", file=sys.stderr)
+            if args.fail_fast:
+                sys.exit(1)
+
+    print(f"--- batch complete: {total - failures}/{total} ok ---", file=sys.stderr)
+    sys.exit(1 if failures else 0)
+
+
 def main():
     # Force UTF-8 on stdout/stderr; default on Windows is cp949 which mangles non-ASCII output.
     for stream in (sys.stdout, sys.stderr):
@@ -368,6 +450,14 @@ def main():
     sub.add_parser("list", help="List enabled workers and models")
     sub.add_parser("health", help="Check health of all enabled workers via SSH")
 
+    batch_p = sub.add_parser(
+        "batch", help="Run multiple 'call' items from a YAML file sequentially"
+    )
+    batch_p.add_argument("--batch-file", dest="batch_file", required=True, help="Path to batch YAML")
+    batch_p.add_argument(
+        "--fail-fast", dest="fail_fast", action="store_true", help="Stop on first failure"
+    )
+
     call_p = sub.add_parser("call", help="Execute a task on a remote worker")
     call_p.add_argument("--worker", help="Target specific worker by ID")
     call_p.add_argument("--tags", help="Comma-separated tags for routing")
@@ -377,6 +467,12 @@ def main():
     call_p.add_argument("--input", default="", help="Short input text")
     call_p.add_argument("--input-file", dest="input_file", help="Path to input text file")
     call_p.add_argument("--output-file", dest="output_file", help="Path to write result")
+    call_p.add_argument(
+        "--auto-output",
+        dest="auto_output",
+        action="store_true",
+        help="Auto-generate --output-file under workers.yaml defaults.output_dir (if --output-file not set)",
+    )
     call_p.add_argument(
         "--max-output-tokens", dest="max_output_tokens", type=int, help="Max output tokens"
     )
@@ -410,6 +506,8 @@ def main():
         cmd_health(args)
     elif args.cmd == "call":
         cmd_call(args)
+    elif args.cmd == "batch":
+        cmd_batch(args)
     else:
         parser.print_help()
         sys.exit(2)
