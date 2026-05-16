@@ -30,6 +30,21 @@ stdout 직접 결과 (without `--output-file`): 결과 본문이 stdout, 토큰 
 
 `--auto-output` 옵션을 쓰면 `--output-file`을 명시하지 않아도 ask.py가 `workers.yaml`의 `defaults.output_dir`(기본 `.ai-cache/`) 아래에 `YYYYMMDD-HHMMSS-<task-hash>.md` 형식으로 자동 생성한다. Orchestrator는 매 호출마다 경로를 직접 짜지 않아도 되고, 경로 인자 boilerplate가 줄어든다.
 
+### Task 템플릿 (`--task-template <NAME>`)
+
+자주 쓰는 task prompt는 `.shared-ai-tools/prompts/templates/<NAME>.md`로 미리 저장돼있다. Orchestrator는 매 호출마다 task 본문을 인라인으로 짜지 않고 템플릿 이름만 지정한다. 현재 제공 템플릿은 해당 디렉토리의 `README.md` 참조.
+
+사용 예:
+```
+ask.py call --tags korean,summary --task-template summarize-ko --input-file <path> --auto-output --peek 120
+```
+
+우선순위: `--task` > `--task-file` > `--task-template`. 셋 중 하나는 반드시 지정.
+
+운영 권장:
+- 반복되는 task 유형은 새 템플릿을 만들어 인라인 task 작성을 줄일 것 (호출당 30~80 토큰 절감)
+- 템플릿 본문에 "출력 형식 명시", "새 내용 생성 금지", "머리말 금지" 같은 가드 문구를 포함해 워커 응답의 군더더기 감소
+
 ### Batch 호출 (`ask.py batch --batch-file <yaml>`)
 
 여러 task를 한 번의 명령으로 묶어 실행한다. 호출별 boilerplate(파이썬 진입점 풀패스 + 인자 키)가 명령 한 번으로 압축된다. 호출 사이에 워커 노드의 keep-alive를 활용하면 모델 로드 비용도 절감.

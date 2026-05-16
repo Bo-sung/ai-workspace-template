@@ -13,6 +13,7 @@ import yaml
 
 WORKERS_YAML = Path(__file__).parent.parent / "workers.yaml"
 REPO_ROOT = WORKERS_YAML.parent.parent  # .shared-ai-tools/.. = repo root
+TEMPLATES_DIR = WORKERS_YAML.parent / "prompts" / "templates"
 
 
 def _resolve_output_dir(defaults):
@@ -210,11 +211,23 @@ def cmd_call(args):
         print("error: must specify --worker or --tags", file=sys.stderr)
         sys.exit(2)
 
-    if not args.task and not args.task_file:
-        print("error: must specify --task or --task-file", file=sys.stderr)
+    if not args.task and not args.task_file and not getattr(args, "task_template", None):
+        print("error: must specify --task, --task-file, or --task-template", file=sys.stderr)
         sys.exit(2)
 
-    task = Path(args.task_file).read_text(encoding="utf-8") if args.task_file else args.task
+    # task source precedence: --task > --task-file > --task-template
+    if args.task:
+        task = args.task
+    elif args.task_file:
+        task = Path(args.task_file).read_text(encoding="utf-8")
+    elif getattr(args, "task_template", None):
+        template_path = TEMPLATES_DIR / f"{args.task_template}.md"
+        if not template_path.exists():
+            print(f"error: task template not found: {template_path}", file=sys.stderr)
+            sys.exit(2)
+        task = template_path.read_text(encoding="utf-8")
+    else:
+        task = None
 
     input_text = ""
     if args.input_file:
@@ -408,6 +421,7 @@ def cmd_batch(args):
             model=item.get("model"),
             task=item.get("task"),
             task_file=item.get("task_file"),
+            task_template=item.get("task_template"),
             input=item.get("input", ""),
             input_file=item.get("input_file"),
             output_file=item.get("output_file"),
@@ -464,6 +478,13 @@ def main():
     call_p.add_argument("--model", help="Model name (required with --worker)")
     call_p.add_argument("--task", help="Short task instruction string")
     call_p.add_argument("--task-file", dest="task_file", help="Path to task instruction file")
+    call_p.add_argument(
+        "--task-template",
+        dest="task_template",
+        metavar="NAME",
+        help="Load task from .shared-ai-tools/prompts/templates/<NAME>.md "
+             "(precedence: --task > --task-file > --task-template)",
+    )
     call_p.add_argument("--input", default="", help="Short input text")
     call_p.add_argument("--input-file", dest="input_file", help="Path to input text file")
     call_p.add_argument("--output-file", dest="output_file", help="Path to write result")
