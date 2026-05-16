@@ -17,8 +17,16 @@ python <repo>/.shared-ai-tools/venvs/ai-tools/Scripts/python.exe <repo>/.shared-
 
 대표 사용:
 ```
-ask.py call --tags <a,b> --task "..." --input-file <path> --output-file <path> --max-output-tokens <n>
+ask.py call --tags <a,b> --task "..." --input-file <path> --output-file <path> --max-output-tokens <n> --peek 120
 ```
+
+`--peek N` 옵션은 출력 파일에 결과를 저장한 뒤 stdout 상태 라인에 첫 N자 미리보기를 함께 출력 — 메인 세션이 결과 검증을 위해 별도 Read를 안 해도 됨.
+
+stdout 상태 라인 형식 (with `--output-file`):
+```
+OK [worker_id/model] (tok in:N out:N) Mc → <path> | <peek text>
+```
+stdout 직접 결과 (without `--output-file`): 결과 본문이 stdout, 토큰 사용량은 stderr.
 
 ## Token-efficiency rules
 
@@ -27,6 +35,8 @@ ask.py call --tags <a,b> --task "..." --input-file <path> --output-file <path> -
 - `--max-output-tokens` 항상 명시 (모델 기본값 의존 금지).
 - 큰 결과는 그대로 본문에 옮기지 말고 `.ai-cache/`에 두고 필요 시 Read offset/limit.
 - 체이닝: 한 워커 출력 파일을 다음 워커 `--input-file`로.
+- **결과 파일 500자 초과 시 통째로 Read 금지** — `--peek N`으로 stdout에서 미리보기를 받거나 사용자에게 파일 경로를 전달해 직접 확인하게 한다. Orchestrator 본문에 결과 전체가 들어가는 순간이 가장 큰 토큰 낭비 지점.
+- ask.py가 stdout 상태 라인에 ollama의 토큰 사용량(`tok in:N out:N`)을 포함하므로, 호출별 회계를 stderr 또는 상태 라인에서 즉시 확인 가능. 운영 측정 자료로 활용할 것.
 
 ## Delegate (워커가 해도 되는 일)
 

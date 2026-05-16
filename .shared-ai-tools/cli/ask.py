@@ -88,16 +88,19 @@ def _call_remote_ollama(
         encoding="utf-8",
     )
     res = json.loads(output)
+    content = ""
     if "message" in res:
         content = res["message"].get("content", "")
-        if content:
-            return content
-        # thinking-mode models (e.g. qwen3) put output in 'thinking' when think:false suppresses it;
-        # fall back so the caller still gets a non-empty result
-        thinking = res["message"].get("thinking", "")
-        if thinking:
-            return thinking
-    raise RuntimeError(f"Unexpected response format: {output[:200]}")
+        # thinking-mode models (e.g. qwen3) put output in 'thinking' when think:false suppresses it
+        if not content:
+            content = res["message"].get("thinking", "")
+    if not content:
+        raise RuntimeError(f"Unexpected response format: {output[:200]}")
+    usage = {
+        "in": res.get("prompt_eval_count", 0),
+        "out": res.get("eval_count", 0),
+    }
+    return content, usage
 
 
 def cmd_list(args):
@@ -281,7 +284,7 @@ def cmd_call(args):
     )
 
     try:
-        result = _call_remote_ollama(
+        result, usage = _call_remote_ollama(
             selected_worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens
         )
     except Exception as e:
@@ -314,6 +317,8 @@ def cmd_call(args):
                         "model": model_name,
                         "warnings": warnings,
                         "result_path": str(out_path),
+                        "chars": chars,
+                        "usage": usage,
                     },
                     ensure_ascii=False,
                 )
@@ -321,8 +326,15 @@ def cmd_call(args):
         else:
             if warnings:
                 print("\n".join(warnings), file=sys.stderr)
+            peek_suffix = ""
+            if args.peek > 0 and chars > 0:
+                peek_text = result[: args.peek].replace("\n", " ").replace("\r", "")
+                if chars > args.peek:
+                    peek_text += "..."
+                peek_suffix = f" | {peek_text}"
             print(
-                f"OK worker={selected_worker['id']} model={model_name} out={out_path} chars={chars}"
+                f"OK [{selected_worker['id']}/{model_name}] "
+                f"(tok in:{usage['in']} out:{usage['out']}) {chars}c → {out_path}{peek_suffix}"
             )
     elif args.json_out:
         print(
@@ -332,6 +344,7 @@ def cmd_call(args):
                     "model": model_name,
                     "warnings": warnings,
                     "result": result,
+                    "usage": usage,
                 },
                 ensure_ascii=False,
             )
@@ -339,10 +352,16 @@ def cmd_call(args):
     else:
         if warnings:
             print("\n".join(warnings), file=sys.stderr)
+        print(f"[tok in:{usage['in']} out:{usage['out']}]", file=sys.stderr)
         print(result, end="")
 
 
 def main():
+    # Force UTF-8 on stdout/stderr; default on Windows is cp949 which mangles non-ASCII output.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure") and stream.encoding and stream.encoding.lower() != "utf-8":
+            stream.reconfigure(encoding="utf-8")
+
     parser = argparse.ArgumentParser(prog="ask.py", description="Remote Ollama worker CLI")
     sub = parser.add_subparsers(dest="cmd")
 
@@ -368,6 +387,13 @@ def main():
         dest="user_approved",
         action="store_true",
         help="Approve EXAONE NC license for this call",
+    )
+    call_p.add_argument(
+        "--peek",
+        type=int,
+        default=0,
+        metavar="N",
+        help="With --output-file: append first N chars of result to stdout status line",
     )
     call_p.add_argument(
         "--json",
