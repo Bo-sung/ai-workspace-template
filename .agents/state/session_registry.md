@@ -2,13 +2,19 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-16T20:50:00+09:00
+Last Updated: 2026-05-16T21:20:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | None | - | - | - | - | - | - |
+
+## Recent Completed Sessions (v2 templates)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260516-2100-worker-cli-v2-templates | INFRA + OPS/COORDINATION | v2 Q — task prompt templates lib + ask.py --task-template; verified summarize-ko + auto-output + peek end-to-end | 2026-05-16T21:00:00+09:00 | 2026-05-16T21:20:00+09:00 | Completed; Roles released |
 
 ## Recent Completed Sessions (v2 extra)
 
