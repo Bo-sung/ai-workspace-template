@@ -2,13 +2,19 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-16T20:30:00+09:00
+Last Updated: 2026-05-16T20:50:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | None | - | - | - | - | - | - |
+
+## Recent Completed Sessions (v2 extra)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260516-2035-worker-cli-v2-extra | INFRA + OPS/COORDINATION | v2 잔여: workers.yaml defaults.output_dir, ask.py --auto-output, batch subcommand, policy O4 batch pattern | 2026-05-16T20:35:00+09:00 | 2026-05-16T20:50:00+09:00 | Completed; verified call --auto-output and batch 2/2; Roles released |
 
 ## Recent Completed Sessions (이번 세션)
 

@@ -115,6 +115,15 @@ Worker Infrastructure transition (MCP → CLI) is COMPLETE. Next track: laptop-g
 
 남은 v2 후보(C2 `--auto-output`, C5 `--batch`, O4 batch 운영 패턴, C6 workers.yaml defaults 확장)는 별도 사이클로 미룸.
 
+### v2 extra — 잔여 4개 처리 (2026-05-16, 같은 날 후속)
+
+- **C6** — `workers.yaml` `defaults.output_dir: .ai-cache` 추가. 상대 경로면 repo root 기준으로 ask.py가 resolve.
+- **C2 (`--auto-output`)** — 출력 경로를 명시하지 않아도 `YYYYMMDD-HHMMSS-<task-sha8>.md`로 자동 생성. 명령 인자 boilerplate 감소.
+- **C5 (`batch` 서브커맨드)** — YAML 파일에 call 항목들을 묶어 한 번에 실행. `--fail-fast` 옵션. batch 기본값 `auto_output: true`이라 출력 파일 자동 분리. boilerplate 절감 효과 호출 수 N에 비례.
+- **O4** — `remote_worker_policy.md`에 batch 운영 패턴 한 단락 추가 (YAML 예시 + 절감률 설명).
+
+검증: `call --auto-output --peek 40` 1회 + 2-item batch. 양쪽 모두 한글·token usage·peek 정상. 자동 출력 파일 `.ai-cache/20260516-154305-657249e7.md` 등.
+
 **세션**: `claude-20260516-1700-game-design-sf-retheme`
 
 ### 확정된 SF 매핑 (용어 사전.md v2.0에 기록됨)
