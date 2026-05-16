@@ -84,7 +84,7 @@ YAML 형식 (둘 다 허용):
 
 ## Token-efficiency rules
 
-- 입력이 200단어 초과면 `--input-file` 사용.
+- 입력이 200단어 초과면 `--input-file` 사용. ask.py는 큰 페이로드를 SSH stdin으로 파이프(`curl --data-binary @-`)하므로 시스템 문서(10KB+) 통째로도 무리 없음.
 - 결과 예상 100단어 초과면 `--output-file` 사용.
 - `--max-output-tokens` 항상 명시 (모델 기본값 의존 금지).
 - 큰 결과는 그대로 본문에 옮기지 말고 `.ai-cache/`에 두고 필요 시 Read offset/limit.

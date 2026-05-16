@@ -129,7 +129,7 @@ def load_workers():
 
 
 def _call_remote_ollama(
-    worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens
+    worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens, timeout_sec=240
 ):
     host = worker["host"]
     port = str(worker.get("port", 22))
@@ -157,19 +157,23 @@ def _call_remote_ollama(
         "keep_alive": 0,
     }
 
-    payload_json = json.dumps(payload).replace("'", "'\\''")
+    # Pipe the JSON payload through SSH stdin → curl --data-binary @- on the worker.
+    # Keeps the SSH command line short regardless of input size; lifts the
+    # Windows OpenSSH command-line-length ceiling that previously broke large
+    # input-file calls (system docs of ~10KB+).
+    payload_json = json.dumps(payload)
     cmd = (
         "touch ~/.ai_worker_active 2>/dev/null; "
         "curl -s -X POST http://127.0.0.1:11434/api/chat "
         "-H 'Content-Type: application/json' "
-        f"-d '{payload_json}'"
+        "--data-binary @-"
     )
 
     output = subprocess.check_output(
         ["ssh", "-p", port, "-o", "BatchMode=yes", target, cmd],
+        input=payload_json,
         stderr=subprocess.STDOUT,
-        stdin=subprocess.DEVNULL,
-        timeout=120,
+        timeout=timeout_sec,
         text=True,
         encoding="utf-8",
     )
@@ -189,14 +193,14 @@ def _call_remote_ollama(
     return content, usage
 
 
-def _call_with_retry(worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens, retry):
+def _call_with_retry(worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens, retry, timeout_sec):
     """Wrap _call_remote_ollama with N retries on transient SSH/Ollama failures.
     Exponential backoff: 1s, 2s, 4s, ... Returns (content, usage, attempts)."""
     last_exc = None
     for attempt in range(retry + 1):
         try:
             content, usage = _call_remote_ollama(
-                worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens
+                worker, model_name, task, input_text, num_ctx, temperature, max_output_tokens, timeout_sec
             )
             return content, usage, attempt + 1
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError, RuntimeError) as e:
@@ -406,12 +410,13 @@ def cmd_call(args):
 
     retry = args.retry if args.retry is not None else int(defaults.get("retry", 0))
     do_trim = args.trim if args.trim is not None else bool(defaults.get("trim", False))
+    timeout_sec = int(defaults.get("timeout_sec", 240))
 
     t_start = time.time()
     try:
         result, usage, attempts = _call_with_retry(
             selected_worker, model_name, task, input_text,
-            num_ctx, temperature, max_output_tokens, retry,
+            num_ctx, temperature, max_output_tokens, retry, timeout_sec,
         )
     except Exception as e:
         duration_ms = int((time.time() - t_start) * 1000)
