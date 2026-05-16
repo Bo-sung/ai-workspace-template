@@ -98,7 +98,22 @@ Worker Infrastructure transition (MCP → CLI) is COMPLETE. Next track: laptop-g
 - EXAONE policy: toggle in workers.yaml (decided)
 - Step granularity: one-step-per-session (decided). This session ends after recording the plan and seeding the Step 1 work-order prompt in the OPS handoff.
 
-## SF Re-theme Phase A 완료 (2026-05-16)
+## Worker CLI v2 — 핵심 최적화 4개 (2026-05-16)
+
+`feat/worker-cli-v2` 브랜치에서 ask.py + 정책 패치. ROI 분석 결과 도출된 핵심 4개 항목:
+
+- **C1 (compact stdout)** — 상태 라인을 `OK [worker/model] (tok in:N out:N) Mc → <path> | <peek>` 형식으로 압축.
+- **C3 (`--peek N`)** — 출력 파일 첫 N자를 stdout 상태 라인에 동봉. Orchestrator가 결과 검증을 위해 별도 Read 1회를 회피 (호출당 200~1000 토큰 절감).
+- **C4 (ollama 토큰 회계)** — ollama 응답의 `prompt_eval_count`/`eval_count`를 `tok in:N out:N`으로 stdout(또는 stderr) 노출. 호출별 측정 자료 즉시 확보.
+- **UTF-8 stdout reconfigure** — Windows 기본 cp949가 mojibake 만들던 버그 해결. `sys.stdout.reconfigure(encoding="utf-8")` main 진입 시 자동 적용.
+
+정책 측 (`remote_worker_policy.md`):
+- **O1** — "결과 파일 500자 초과 시 통째 Read 금지, --peek 또는 사용자 직접 확인" 규칙 명시.
+- Invocation 섹션에 `--peek 120` 예시와 stdout 형식 문서화.
+
+검증: laptop-gemma-e2b에 한글 task 1회. stdout `OK [laptop-gemma-e2b/gemma4:e2b] (tok in:181 out:9) 17c → ...v2-verify.md | 토큰 사용량이 이제 보고됩니다.` — 4개 기능 모두 정상.
+
+남은 v2 후보(C2 `--auto-output`, C5 `--batch`, O4 batch 운영 패턴, C6 workers.yaml defaults 확장)는 별도 사이클로 미룸.
 
 **세션**: `claude-20260516-1700-game-design-sf-retheme`
 

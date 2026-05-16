@@ -2,13 +2,19 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-16T19:30:00+09:00
+Last Updated: 2026-05-16T20:30:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | None | - | - | - | - | - | - |
+
+## Recent Completed Sessions (이번 세션)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260516-2000-worker-cli-v2 | INFRA + OPS/COORDINATION | v2 optimization — ask.py: compact stdout, --peek N, ollama token usage in status line, UTF-8 stdout reconfigure; policy O1 rule added | 2026-05-16T20:00:00+09:00 | 2026-05-16T20:30:00+09:00 | Completed; Roles released |
 
 ## Recent Completed Sessions (이번 세션)
 
