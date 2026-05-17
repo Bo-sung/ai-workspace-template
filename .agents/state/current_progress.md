@@ -2,10 +2,11 @@
 
 Single source of truth for project progress.
 
-Last Updated: 2026-05-17T11:30:00+09:00
+Last Updated: 2026-05-17T22:43:37+09:00
 
 ## Completed
 
+- Session and permission cleanup completed: active sessions cleared and no resource locks remain.
 - Shared multi-agent operating framework initialized under `.agents/`.
 - Thin agent entrypoints added: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`.
 - Project quick reference at `Project/FrontierBastion_plan/PROJECT_QUICK_REFERENCE.md` realigned to the current repo root (`H:\Git\Portpolio\FrontierBastion`).
@@ -21,7 +22,7 @@ Last Updated: 2026-05-17T11:30:00+09:00
 
 ## In Progress
 
-- OPS realign session (`claude-20260515-1005-ops-realign`): updating operating docs to match current layout and seeding the GAME_DESIGN handoff for the SF re-theme.
+- None.
 
 ## Worker Reconnaissance (2026-05-15, Explore agents)
 
@@ -259,3 +260,4 @@ Hook 활성화 상태 (Codex가 사용자 지시에 따라 2026-05-17 적용):
 
 - Before starting the GAME_DESIGN session, confirm no other session has registered the `GAME_DESIGN` role.
 - After Phase A, do a glossary cross-check between `용어 사전.md` and each edited 시스템 doc to ensure no orphaned fantasy terms remain.
+- `Project/FrontierBastion_plan/시스템/설계_계획/` created as the wiki-style planning/design area; GAME_DESIGN and DATA_TECH owned docs are being reorganized into this hierarchy with deprecated stubs left at the old paths.

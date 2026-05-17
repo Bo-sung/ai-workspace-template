@@ -2,14 +2,26 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-17T12:00:00+09:00
+Last Updated: 2026-05-17T22:43:37+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
+| None | - | - | - | - | - | - |
+
+## Recent Completed Sessions (cleanup)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | claude-20260517-1500-ui-assets-doc-reorg | UI_ASSETS | UI design doc wiki reorg and asset link cleanup | 2026-05-17T15:00:00+09:00 | 2026-05-17T22:43:37+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (pilot-system-rename — 권한 회수)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
 | Antigravity | antigravity-20260517-0500-doc-refactor-pilot-drone | GAME_DESIGN | 파일럿+드론 부대 구조 공식화 — 11개 문서 리팩터링 완료 | 2026-05-17T05:00:00+09:00 | 2026-05-17T05:00:00+09:00 | Completed; Role released |
-| Claude | claude-20260517-1200-pilot-system-rename | GAME_DESIGN | 영웅 시스템.md → 파일럿 시스템.md rename + 영웅/ → 파일럿/ + cross-link 전체 갱신 | 2026-05-17T12:00:00+09:00 | 2026-05-17T12:00:00+09:00 | Active |
+| Claude | claude-20260517-1200-pilot-system-rename | GAME_DESIGN | 영웅 시스템.md → 파일럿 시스템.md rename (권한 회수로 중단). git mv staged(미커밋), 일부 링크 갱신 완료, 나머지 미완료 | 2026-05-17T12:00:00+09:00 | 2026-05-17T13:00:00+09:00 | Abandoned; Role released; 락 해제 완료 |
 
 ## Recent Completed Sessions (glossary v2)
 
