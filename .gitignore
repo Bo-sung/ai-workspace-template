@@ -1,5 +1,14 @@
-# Editor settings
+# Editor / IDE local settings and caches
+.idea/
+.vscode/
+.vs/
+.fleet/
+.zed/
+*.code-workspace
+
+# Obsidian local vault settings and caches
 .obsidian/
+.trash/
 
 # AI Agent files
 .claude/
@@ -26,3 +35,9 @@ Project/
 
 # AI cache files
 .ai-cache/
+
+# Local project-specific agent overlays and generated caches.
+# The reusable agent OS should stay portable across projects; keep per-project
+# context here instead of baking it into tracked base rules.
+.agents/project/
+.agents/cache/
