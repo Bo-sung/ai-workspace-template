@@ -2,7 +2,7 @@
 
 Single source of truth for shared resource locks.
 
-Last Updated: 2026-05-17T22:43:37+09:00
+Last Updated: 2026-05-18T07:30:55+09:00
 
 | Type | Resource | Agent | Session | Role | Locked At | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -12,6 +12,8 @@ Last Updated: 2026-05-17T22:43:37+09:00
 
 | Type | Resource | Agent | Session | Released At | Note |
 | --- | --- | --- | --- | --- | --- |
+| Repo scaffold | Project/FrontierBastion_battlecore/** | Codex | codex-20260518-0717-shared-battlecore-setup | 2026-05-18T07:30:55+09:00 | BattleSim.Core repo scaffold complete; commit ebc93d7 |
+| Shared build config | Project/FrontierBastion_battlecore/*.sln, Project/FrontierBastion_battlecore/**/*.csproj, Project/FrontierBastion_battlecore/Directory.Build.props | Codex | codex-20260518-0717-shared-battlecore-setup | 2026-05-18T07:30:55+09:00 | Initial solution/project/build config complete |
 | Shared file | Project/FrontierBastion_plan/README.md | Claude | claude-20260517-1200-pilot-system-rename | 2026-05-17T13:00:00+09:00 | 권한 회수 — rename 작업 중단 |
 | Shared file | Project/FrontierBastion_plan/시스템/개발 로드맵.md | Claude | claude-20260517-1200-pilot-system-rename | 2026-05-17T13:00:00+09:00 | 권한 회수 — rename 작업 중단 |
 | Shared file | Project/FrontierBastion_plan/용어 사전.md | Claude | claude-20260517-1100-glossary-sf-realign | 2026-05-17T11:30:00+09:00 | 용어 사전 v2 SF 재정렬 완료 후 해제 |

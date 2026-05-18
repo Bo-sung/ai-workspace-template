@@ -25,14 +25,23 @@ between projects without carrying stale context.
 
 | Role | Owned paths |
 | --- | --- |
-| `OPS/COORDINATION` |  |
-| `INFRA` |  |
-| `GAME_DESIGN` |  |
-| `LORE_ART` |  |
-| `DATA_TECH` |  |
-| `UI_ASSETS` |  |
-| `CLIENT` |  |
-| `SERVER` |  |
+| `OPS_COORDINATION` |  |
+| `INFRA_TOOLS` |  |
+| `PLAN_GAME_DESIGN` |  |
+| `PLAN_LORE_ART` |  |
+| `PLAN_DATA_TECH` |  |
+| `PLAN_UI_ASSETS` |  |
+| `SHARED_BATTLE_CORE` |  |
+| `SHARED_API_CONTRACT` |  |
+| `SERVER_API` |  |
+| `SERVER_DOMAIN` |  |
+| `SERVER_DATA` |  |
+| `SERVER_BATTLE_VALIDATION` |  |
+| `CLIENT_APP` |  |
+| `CLIENT_BATTLE_ADAPTER` |  |
+| `CLIENT_NETWORK` |  |
+| `QA_TEST` |  |
+| `BUILD_INFRA` |  |
 
 ## Shared Paths Requiring Locks
 

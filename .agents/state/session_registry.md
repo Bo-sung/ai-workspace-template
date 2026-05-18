@@ -2,13 +2,47 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-17T22:43:37+09:00
+Last Updated: 2026-05-18T11:30:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| None | - | - | - | - | - | - |
+| Codex | codex-20260518-0605-server-initial-check | SERVER_API + SERVER_DOMAIN + SERVER_DATA + SERVER_BATTLE_VALIDATION | Server repo status and ASP.NET scaffold read-only check | 2026-05-18T06:05:39+09:00 | 2026-05-18T06:05:39+09:00 | Active |
+| Codex | codex-20260518-0602-client-initial-check | CLIENT_APP + CLIENT_BATTLE_ADAPTER + CLIENT_NETWORK | Client repo status and Unity scaffold read-only check | 2026-05-18T06:02:19+09:00 | 2026-05-18T06:02:19+09:00 | Active |
+
+## Recent Completed Sessions (battlecore API skeleton cleanup)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude (Sonnet 4.6) | sonnet-20260518-shared-battle-core-api-cleanup | SHARED_BATTLE_CORE | BattleSim.Core public API skeleton cleanup — LaneType/OwnerSide enum, SlotDefinition[] → BattleInitialState, BattleConfigSnapshot defensive copy, Fp.ToString negative fix, nullable warnings suppressed. Build 0W/0E, all tests pass. | 2026-05-18T11:00:00+09:00 | 2026-05-18T11:30:00+09:00 | Completed; Role released |
+| Claude (Sonnet 4.6) | sonnet-20260518-build-infra-battlecore-scaffold | BUILD_INFRA | BattleSim.Core scaffold 보완 — LangVersion 보수화, fixtures/initial_states 추가, 미커밋 skeleton 커밋 | 2026-05-18T00:00:00+09:00 | 2026-05-18T00:00:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (battlecore API skeleton implementation)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude (Opus 4.7) | opus-20260518-shared-battle-core-api-skeleton | SHARED_BATTLE_CORE | Implemented Core public API skeleton: Fp readonly struct, internal Xoshiro256** RNG (SplitMix64 seed), Config/Initial/State/Command/Result types, Outcome+EndReason split, BattleSimulator skeleton, Fp/RNG-golden/simulator tests. Build + run PASS. No .sln/.csproj edits. | 2026-05-18T10:30:00+09:00 | 2026-05-18T10:45:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (battlecore API draft)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude (Sonnet 4.6) | sonnet-20260518-shared-battle-core-fp-rng-review | SHARED_BATTLE_CORE | Fixed-point/RNG 정책 후보 검토 — 8개 섹션 보고, handoff/battlecore.md 갱신 | 2026-05-18T00:00:00+09:00 | 2026-05-18T00:00:00+09:00 | Completed; Role released |
+| Claude (Sonnet 4.6) | sonnet-20260518-shared-battle-core-input-replay-model | SHARED_BATTLE_CORE | Input log & replay data model 후보 정리 — 8개 섹션 보고, handoff/battlecore.md 갱신 | 2026-05-18T00:00:00+09:00 | 2026-05-18T00:00:00+09:00 | Completed; Role released |
+| Claude (Sonnet 4.6) | sonnet-20260518-shared-battle-core-api-draft | SHARED_BATTLE_CORE | BattleSim.Core public API 초안 작성 — 7개 섹션 보고, handoff/battlecore.md 갱신 | 2026-05-18T00:00:00+09:00 | 2026-05-18T00:00:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (battlecore setup)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Codex | codex-20260518-0717-shared-battlecore-setup | SHARED_BATTLE_CORE + BUILD_INFRA | Created BattleSim.Core repo with Git Flow branches and initial solution/project structure. Commit ebc93d7 | 2026-05-18T07:17:21+09:00 | 2026-05-18T07:30:55+09:00 | Completed; Roles released |
+
+## Recent Completed Sessions (battlecore initial check)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Codex | codex-20260518-0653-shared-battle-core-initial-check | SHARED_BATTLE_CORE | Battle core repo existence check and initial structure/API proposal | 2026-05-18T06:53:22+09:00 | 2026-05-18T06:54:21+09:00 | Completed; Role released |
 
 ## Recent Completed Sessions (cleanup)
 

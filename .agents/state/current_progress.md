@@ -2,7 +2,7 @@
 
 Single source of truth for project progress.
 
-Last Updated: 2026-05-17T22:43:37+09:00
+Last Updated: 2026-05-18T07:30:55+09:00
 
 ## Completed
 
@@ -15,14 +15,27 @@ Last Updated: 2026-05-17T22:43:37+09:00
 - `.agents/rules/module_permissions.md` rewritten to use the actual `Project/FrontierBastion_plan/**` paths (previously referenced as if at repo root).
 - Stale Codex lock on `README.md` from `codex-20260513-0913-readme-status` released.
 - Initial GDD and Worldbuilding documents present under `Project/FrontierBastion_plan/` (numbered overview docs `01_…05_`, plus `시스템/` module set carried over from the legacy FantasyTowerDeffence_docs repo).
+- BattleSim.Core separate repo initialized at `Project/FrontierBastion_battlecore` with Git Flow `main`/`develop`, initial `.sln`, `src/`, `tests/`, `fixtures/`, and `docs/` structure. Initial commit: `ebc93d7` (`chore: scaffold BattleSim.Core repo`).
 
 ## Active Decision
 
 - **SF Re-theme is the canonical direction.** The 기획서 원본 (`Project/FrontierBastion_plan/Frontier_Bastion_기획서_원본.md`) defines the game as a 공방형 라인 디펜스 RPG + 변방 개척 시뮬레이션 set in an SF colony frontier (총독/파일럿/메카/식민지/침식체 군집). The carried-over `시스템/` documents still use fantasy terminology (영웅/영지/마나/MAG/RES). Going forward, system docs are to be re-themed to the SF concept while preserving combat mechanics and Phase 1 scope.
+- **BattleSim.Core is a separate repo.** The shared deterministic core lives at `Project/FrontierBastion_battlecore` and is owned by `SHARED_BATTLE_CORE`; `.sln`, `.csproj`, `Directory.Build.props`, package/versioning, and shared build config remain `BUILD_INFRA`-sensitive. Target Framework is currently `.NET Standard 2.1` candidate only; package/versioning and server/client reference style are undecided.
 
 ## In Progress
 
 - None.
+
+## BattleSim.Core Setup (2026-05-18)
+
+- Repo: `H:\Git\Portpolio\FrontierBastion\Project\FrontierBastion_battlecore`
+- Branches: `main`, `develop`; current branch after setup is `develop`.
+- Git Flow config: production `main`, development `develop`, prefixes `feature/`, `bugfix/`, `release/`, `hotfix/`, `support/`, version tag prefix `v`.
+- Solution: `BattleSim.Core.sln`
+- Projects: `src/BattleSim.Core/BattleSim.Core.csproj` and `tests/BattleSim.Core.Tests/BattleSim.Core.Tests.csproj`
+- Initial validation: `dotnet build BattleSim.Core.sln` PASS; `dotnet run --project tests\BattleSim.Core.Tests\BattleSim.Core.Tests.csproj --no-build` PASS.
+- Current public API is intentionally minimal: `BattleCoreDefaults` exposes only Phase 1 defaults (`TickRate=20`, `TickMilliseconds=50`, `FixedPointScale=10000`).
+- Pending decisions: Target Framework final value, deterministic RNG algorithm, package/versioning, server/client reference strategy, full command/result model.
 
 ## Worker Reconnaissance (2026-05-15, Explore agents)
 

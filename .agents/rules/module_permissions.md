@@ -4,22 +4,34 @@ A session may freely edit only the paths owned by its assigned Role. Shared path
 require a lock. Sensitive paths require user confirmation even if a Role appears
 related.
 
-This file defines portable role behavior. Project-specific path ownership should
-be supplied by the local overlay under `.agents/project/`, especially
-`.agents/project/module_permissions.md` when present.
+This file defines portable role behavior and naming conventions. Project-specific
+path ownership should be supplied by the local overlay under `.agents/project/`,
+especially `.agents/project/module_permissions.md` when present.
+
+Use namespaced Role names for implementation work:
+
+- `PLAN_*` for planning and design documents.
+- `SERVER_*` for server implementation.
+- `CLIENT_*` for client implementation.
+- `SHARED_*` for shared libraries and contracts.
+- `QA_*` for tests, fixtures, and validation.
+- `BUILD_*` for solution, package, CI, and build infrastructure.
 
 ## Role Semantics
 
 | Role | Typical responsibility |
 | --- | --- |
-| `OPS/COORDINATION` | Agent operating docs, entrypoints, lifecycle docs, state, locks, handoff |
-| `INFRA` | Shared agent tooling, local automation, hooks, reusable scripts |
-| `GAME_DESIGN` | Gameplay rules, system design, balancing docs |
-| `LORE_ART` | Narrative, setting, art direction, visual tone |
-| `DATA_TECH` | Data architecture, technical architecture, backend/server docs, KPI |
-| `UI_ASSETS` | UI design, mockups, diagrams, visual assets |
-| `CLIENT` | Client runtime code and client-specific assets |
-| `SERVER` | Server runtime code, API, persistence, backend tests |
+| `OPS_COORDINATION` | Agent operating docs, entrypoints, lifecycle docs, state, locks, handoff |
+| `INFRA_TOOLS` | Shared agent tooling, local automation, hooks, reusable scripts |
+| `PLAN_GAME_DESIGN` | Gameplay rules, system design, balancing docs |
+| `PLAN_LORE_ART` | Narrative, setting, art direction, visual tone |
+| `PLAN_DATA_TECH` | Data architecture, technical architecture, backend/server docs, KPI |
+| `PLAN_UI_ASSETS` | UI design, mockups, diagrams, visual planning assets |
+| `SERVER_*` | Server runtime code, API, persistence, validation, backend tests |
+| `CLIENT_*` | Client runtime code, UI integration, battle adapter, network client |
+| `SHARED_*` | Shared libraries, contracts, DTO/schema, deterministic core logic |
+| `QA_*` | Tests, fixtures, validation, reproducibility checks |
+| `BUILD_*` | Solution, package, CI, and build infrastructure |
 
 ## Project Path Ownership
 
@@ -33,7 +45,7 @@ project ownership map. It should define:
 
 If no project ownership map exists, use these safe defaults:
 
-- `OPS/COORDINATION` may edit tracked agent operating docs under `.agents/**`
+- `OPS_COORDINATION` may edit tracked agent operating docs under `.agents/**`
   and root agent entrypoints after user approval.
 - Runtime or project content is read-only until the user assigns a Role and
   scope.

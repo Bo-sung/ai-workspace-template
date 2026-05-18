@@ -64,20 +64,27 @@ status, active locks, or progress summaries.
 
 ## Role Summary
 
-The base system defines role semantics only. Concrete owned paths belong in the
-project overlay or in `.agents/rules/module_permissions.md` when this repository
-is intentionally serving as a project-specific control repo.
+The base system defines role naming conventions and semantics only. Concrete
+owned paths belong in the project overlay or in
+`.agents/rules/module_permissions.md` when this repository is intentionally
+serving as a project-specific control repo.
+
+Namespace implementation roles by work area so prompts stay unambiguous:
+`PLAN_*`, `SERVER_*`, `CLIENT_*`, `SHARED_*`, `QA_*`, and `BUILD_*`.
 
 | Role | Purpose |
 | --- | --- |
-| `OPS/COORDINATION` | Coordination, operating docs, entrypoints, state, locks, handoff |
-| `INFRA` | Agent tooling, local automation, shared scripts, hooks |
-| `GAME_DESIGN` | Gameplay and system design documents |
-| `LORE_ART` | Worldbuilding, narrative, art direction, visual tone |
-| `DATA_TECH` | Data, technical architecture, KPI, server/backend design |
-| `UI_ASSETS` | UI design, mockups, diagrams, visual assets |
-| `CLIENT` | Client runtime implementation |
-| `SERVER` | Server runtime implementation |
+| `OPS_COORDINATION` | Coordination, operating docs, entrypoints, state, locks, handoff |
+| `INFRA_TOOLS` | Agent tooling, local automation, shared scripts, hooks |
+| `PLAN_GAME_DESIGN` | Gameplay and system design documents |
+| `PLAN_LORE_ART` | Worldbuilding, narrative, art direction, visual tone |
+| `PLAN_DATA_TECH` | Data, technical architecture, KPI, server/backend design docs |
+| `PLAN_UI_ASSETS` | UI design, mockups, diagrams, visual planning assets |
+| `SERVER_*` | Server runtime implementation split by API/domain/data/validation |
+| `CLIENT_*` | Client runtime implementation split by app/battle/network |
+| `SHARED_*` | Shared libraries and contracts used by multiple runtimes |
+| `QA_*` | Tests, fixtures, validation, and reproducibility checks |
+| `BUILD_*` | Solution, package, CI, and build infrastructure |
 
 ## Default Behavior
 
