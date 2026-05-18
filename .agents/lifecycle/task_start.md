@@ -1,11 +1,14 @@
 # Task Start Checklist
 
-1. Confirm the requested task and intended Role.
-2. Check whether the Role is free in `.agents/state/session_registry.md`.
-3. Register or update the session row.
-4. Read `.agents/state/current_progress.md`.
-5. Read the Role handoff file.
-6. List expected files and resources before editing.
-7. Identify shared resources and required locks.
-8. Identify sensitive resources that need user confirmation.
-9. Decide the minimum validation needed before completion.
+1. Confirm the requested task and registered Role.
+2. Check whether the incoming prompt conflicts with the registered Role.
+3. If the prompt requests a different Role, stop and report unless the
+   coordinator already updated the registry and explicitly requested the change.
+4. Check whether the Role is free in `.agents/state/session_registry.md`.
+5. Register or update the session row.
+6. Read `.agents/state/current_progress.md`.
+7. Read the Role handoff file.
+8. List expected files and resources before editing.
+9. Identify shared resources and required locks.
+10. Identify sensitive resources that need user confirmation.
+11. Decide the minimum validation needed before completion.

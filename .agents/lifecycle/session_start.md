@@ -10,3 +10,5 @@
 8. If no Role is assigned, remain read-only.
 9. If the intended Role is free, register the session.
 10. If the intended Role is occupied, stop and report to the user.
+11. Treat the registered Role as locked for the session unless the coordinator
+    explicitly changes it and updates the registry first.

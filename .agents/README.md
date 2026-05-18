@@ -90,9 +90,13 @@ Namespace implementation roles by work area so prompts stay unambiguous:
 
 - No assigned Role means read-only unless the user explicitly approves the
   current task scope.
+- The registered Role is stable for the lifetime of the session. Ordinary task
+  prompts may assign work, but they do not change the session Role.
 - A Role may freely edit only its owned paths.
 - Shared resources require a lock in `.agents/state/resource_locks.md`.
 - Sensitive resources require user confirmation.
+- If an incoming prompt conflicts with the registered Role, stop and report the
+  conflict instead of silently switching roles.
 - If a conflict or uncertainty appears, stop and report using
   `.agents/lifecycle/review_needed.md`.
 

@@ -12,19 +12,40 @@
 - Re-read the relevant state file immediately before changing it.
 - Update only the row or section you own.
 - Do not store current state in `.claude/`, local prompts, chat transcripts, or private agent memory.
+- Treat the Role in `.agents/state/session_registry.md` as authoritative for the
+  session. Ordinary task prompts may narrow work, but they may not silently
+  reassign the session to another Role.
+- If a prompt conflicts with the registered Role, stop and report the conflict
+  instead of accepting the new Role.
 - When work is handed off, write only the next-session essentials in the Role handoff file.
 
 ## Coordinator Discipline
 
 - The Coordinator may assign work, detect conflicts, prepare prompts, review outputs, and maintain operating state.
 - The Coordinator must not implement project content unless the user assigns a Worker Role.
+- A Role change requires an explicit coordinator instruction and a matching
+  registry update before the session follows the new Role.
 - Workers must report blockers instead of crossing Role boundaries silently.
+- When a lead/coordinator session proposes a worker delegation, keep
+  coordinator-only allocation notes separate from the copyable worker prompt.
+- Coordinator-only allocation notes include model tier, candidate models, tier
+  rationale, and escalation conditions.
+- The worker prompt itself must be a clean copy-ready block or file containing
+  only instructions the worker needs to execute the task, unless the user
+  explicitly asks for the allocation notes to be embedded.
+- Worker prompts must use a dry, direct style. Include only execution-critical
+  information. Remove praise, framing, persuasive explanation, and other
+  non-essential prose.
 
 ## Tiered Reasoning Protocol (Multi-Model Collaboration)
 
-- **Planning & Architecture:** Prefer Expert Cloud Workers (Claude 3.5 Sonnet, Gemini 1.5 Pro) for global strategy and complex system design.
-- **Execution & Implementation:** Use Expert Cloud Workers for core logic; use Remote Local Workers for boilerplate, formatting, and low-risk documentation.
-- **Cross-Review:** Whenever possible, have a different model class (e.g., Gemini reviewing Claude's draft) perform the final check before the Orchestrator applies changes.
+- Use the project overlay model-tier policy when one is provided.
+- Prefer higher tiers for shared boundaries, architecture, deterministic combat,
+  public APIs, database consistency, security, and cross-repo work.
+- Prefer lower tiers for bounded execution, repetitive cleanup, search,
+  classification, and draft-only support.
+- Whenever practical, use a different model class for final review of
+  high-impact work before the orchestrator applies changes.
 
 ## User Change Protection
 

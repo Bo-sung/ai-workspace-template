@@ -3,6 +3,7 @@
 Stop and report to the user before proceeding when any of these occur:
 
 - Role-owned paths are not enough and a Role-external file must be modified.
+- An incoming prompt assigns a Role different from the registered Role.
 - A shared resource must be modified.
 - A lock conflict exists.
 - A generator, bulk regeneration, migration, build, deploy, or external environment action is needed.
