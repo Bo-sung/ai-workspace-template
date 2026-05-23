@@ -2,12 +2,13 @@
 
 Single source of truth for project progress.
 
-Last Updated: 2026-05-24T02:22:00+09:00
+Last Updated: 2026-05-24T03:15:00+09:00
 
 ## Completed
 
 - BattleSim.Core v0.4 deterministic combat model expansion completed: defense, minimum damage (1.0 FP), attack period tick validation, lane world Y, and cross-lane Manhattan distance targeting implemented with tie-breaking on numeric IDs. Added explicit sorting of entities by `NumericId` to guarantee deterministic execution order without relying on implicit source list ordering. Custom tests updated to call AdvanceTick twice where movement is required; all 18 test cases and smoke scenarios pass successfully. [전투 처리 순서 단일 NumericId 정렬 변경 및 크로스 라인 타겟 탐색 활성화 관련하여 기존 SmokeScenarios 다중 라인 시나리오 회귀 테스트 결과 동일성이 유지됨을 확인했고 회귀 없음.]
 - BattleSim.Core v0.4 client integration completed: Synchronized `BattleSim.Core.dll` plugin, mirrored constructor signatures in `TroopCardData.cs`, replaced legacy stage prototype deck in `StagePrototypeCatalog.cs` with the new symmetric v0.4 4-card deck, implemented dynamic default lane helpers, and added `StageAppDebugController.cs` MonoBehaviour bridge providing F6 hotkey bootstrapping, runtime spawning/recall commands with same-tick duplicate slot safety guards, and OnGUI stats overlay. Verified with 0 compilation errors via `ValidateClient.csproj`.
+- Stage Battle World View (v0.4 native) completed: Created pure runtime-generated `StageBattleWorldView.cs` rendering lane bars, base columns (color-lerped by HP), entity markers (parsed `NumericId` order), and upper-center TextMesh result banner. Connected to `StageAppDebugController.cs` in LateUpdate with automatic Camera allocation/centering, orthographic scaling, and SolidColor background. Verified compile-clean (0 errors).
 - Session and permission cleanup completed: active sessions cleared and no resource locks remain.
 - Shared multi-agent operating framework initialized under `.agents/`.
 - Thin agent entrypoints added: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`.

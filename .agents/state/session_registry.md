@@ -2,7 +2,7 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-24T02:22:00+09:00
+Last Updated: 2026-05-24T03:15:00+09:00
 
 ## Active Sessions
 
@@ -14,6 +14,7 @@ Last Updated: 2026-05-24T02:22:00+09:00
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260524-client-stage-battle-world-view-v0.4 | CLIENT_APP | Stage Battle World View 신규 작성 (v0.4 모델 네이티브) | 2026-05-24T03:07:23+09:00 | 2026-05-24T03:15:00+09:00 | Completed; Role released |
 | Antigravity | antigravity-20260524-client-app-v0.4-stage-deck-app-debug-bridge | CLIENT_APP | BattleSim.Core v0.4 client mirror + Stage 4장 프로토타입 덱 + Stage App 디버그 입력 브리지 | 2026-05-24T01:03:14+09:00 | 2026-05-24T02:22:00+09:00 | Completed; Role released |
 
 ## Recent Completed Sessions (battlecore v0.4 combat model expansion)
