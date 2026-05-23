@@ -2,16 +2,18 @@
 
 Single source of truth for shared resource locks.
 
-Last Updated: 2026-05-18T07:30:55+09:00
+Last Updated: 2026-05-24T02:22:00+09:00
 
 | Type | Resource | Agent | Session | Role | Locked At | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
-| None | - | - | - | - | - | - |
 
 ## Recently Released
 
 | Type | Resource | Agent | Session | Released At | Note |
 | --- | --- | --- | --- | --- | --- |
+| Shared Path | Project/FrontierBastion_client/Assets/Scripts/Battle/Plugins/BattleSim.Core.dll, Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/**, Project/FrontierBastion_client/Assets/Scripts/Debug/Battle/DebugBattleScenarioFactory.cs, Project/FrontierBastion_client/Assets/Scripts/App/** | Antigravity | antigravity-20260524-client-app-v0.4-stage-deck-app-debug-bridge | 2026-05-24T02:22:00+09:00 | BattleSim.Core v0.4 client integration and Stage prototype deck completed and verified. |
+| Shared Path | Project/FrontierBastion_battlecore/src/BattleSim.Core/BattleCoreDefaults.cs, Config/SlotDefinition.cs, Config/LaneDefinition.cs, Simulation/BattleSimulator.cs, tests/BattleSim.Core.Tests/Simulation/**, fixtures/** | Antigravity | antigravity-20260524-shared-battle-core-v0.4 | 2026-05-24T00:45:00+09:00 | BattleSim.Core v0.4 combat model expansion completed and verified with explicit NumericId sorting. |
+| Repo restructure | Project/FrontierBastion_client/** | Antigravity | antigravity-20260519-client-folder-restructure | 2026-05-19T02:45:00+09:00 | Reorganized Unity project folder structure to pull My project contents to FrontierBastion_client root, updated .gitignore/.gitattributes templates, and staged/committed changes. |
 | Repo scaffold | Project/FrontierBastion_battlecore/** | Codex | codex-20260518-0717-shared-battlecore-setup | 2026-05-18T07:30:55+09:00 | BattleSim.Core repo scaffold complete; commit ebc93d7 |
 | Shared build config | Project/FrontierBastion_battlecore/*.sln, Project/FrontierBastion_battlecore/**/*.csproj, Project/FrontierBastion_battlecore/Directory.Build.props | Codex | codex-20260518-0717-shared-battlecore-setup | 2026-05-18T07:30:55+09:00 | Initial solution/project/build config complete |
 | Shared file | Project/FrontierBastion_plan/README.md | Claude | claude-20260517-1200-pilot-system-rename | 2026-05-17T13:00:00+09:00 | 권한 회수 — rename 작업 중단 |

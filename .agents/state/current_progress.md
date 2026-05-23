@@ -2,10 +2,12 @@
 
 Single source of truth for project progress.
 
-Last Updated: 2026-05-18T07:30:55+09:00
+Last Updated: 2026-05-24T02:22:00+09:00
 
 ## Completed
 
+- BattleSim.Core v0.4 deterministic combat model expansion completed: defense, minimum damage (1.0 FP), attack period tick validation, lane world Y, and cross-lane Manhattan distance targeting implemented with tie-breaking on numeric IDs. Added explicit sorting of entities by `NumericId` to guarantee deterministic execution order without relying on implicit source list ordering. Custom tests updated to call AdvanceTick twice where movement is required; all 18 test cases and smoke scenarios pass successfully. [전투 처리 순서 단일 NumericId 정렬 변경 및 크로스 라인 타겟 탐색 활성화 관련하여 기존 SmokeScenarios 다중 라인 시나리오 회귀 테스트 결과 동일성이 유지됨을 확인했고 회귀 없음.]
+- BattleSim.Core v0.4 client integration completed: Synchronized `BattleSim.Core.dll` plugin, mirrored constructor signatures in `TroopCardData.cs`, replaced legacy stage prototype deck in `StagePrototypeCatalog.cs` with the new symmetric v0.4 4-card deck, implemented dynamic default lane helpers, and added `StageAppDebugController.cs` MonoBehaviour bridge providing F6 hotkey bootstrapping, runtime spawning/recall commands with same-tick duplicate slot safety guards, and OnGUI stats overlay. Verified with 0 compilation errors via `ValidateClient.csproj`.
 - Session and permission cleanup completed: active sessions cleared and no resource locks remain.
 - Shared multi-agent operating framework initialized under `.agents/`.
 - Thin agent entrypoints added: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`.
@@ -16,11 +18,14 @@ Last Updated: 2026-05-18T07:30:55+09:00
 - Stale Codex lock on `README.md` from `codex-20260513-0913-readme-status` released.
 - Initial GDD and Worldbuilding documents present under `Project/FrontierBastion_plan/` (numbered overview docs `01_…05_`, plus `시스템/` module set carried over from the legacy FantasyTowerDeffence_docs repo).
 - BattleSim.Core separate repo initialized at `Project/FrontierBastion_battlecore` with Git Flow `main`/`develop`, initial `.sln`, `src/`, `tests/`, `fixtures/`, and `docs/` structure. Initial commit: `ebc93d7` (`chore: scaffold BattleSim.Core repo`).
+- Unity project folder restructure completed: pulled all assets, settings, packages, and solution files out from the nested `My project` folder into the root `FrontierBastion_client` directory, and configured standard `.gitignore` and `.gitattributes` for Unity.
 
 ## Active Decision
 
 - **SF Re-theme is the canonical direction.** The 기획서 원본 (`Project/FrontierBastion_plan/Frontier_Bastion_기획서_원본.md`) defines the game as a 공방형 라인 디펜스 RPG + 변방 개척 시뮬레이션 set in an SF colony frontier (총독/파일럿/메카/식민지/침식체 군집). The carried-over `시스템/` documents still use fantasy terminology (영웅/영지/마나/MAG/RES). Going forward, system docs are to be re-themed to the SF concept while preserving combat mechanics and Phase 1 scope.
 - **BattleSim.Core is a separate repo.** The shared deterministic core lives at `Project/FrontierBastion_battlecore` and is owned by `SHARED_BATTLE_CORE`; `.sln`, `.csproj`, `Directory.Build.props`, package/versioning, and shared build config remain `BUILD_INFRA`-sensitive. Target Framework is currently `.NET Standard 2.1` candidate only; package/versioning and server/client reference style are undecided.
+
+- **Client battle rendering direction (2026-05-21).** The prototype's end target is the planned stage system implementation. During early fun validation, IMGUI debug views are acceptable as disposable tooling. For the actual stage/battle presentation, use `SpriteRenderer`/world-space rendering for characters, units, projectiles, and combat effects; use `uGUI` for HUD, cards, buttons, status panels, and result UI. Do not render large numbers of combat actors as uGUI Images. Keep logical units individual for the original-game feel. For high counts, prefer `SpriteRenderer` pooling first, then stable visibility caps/LOD for overlapping actors, ParticleSystem or batched/custom renderers for projectiles/effects, and only later custom GPU-instanced atlas rendering if profiling proves it necessary. GPU batching/instancing can support animation, but large-scale animated units require atlas-frame data via shader/instance data rather than one Animator per unit.
 
 ## In Progress
 
@@ -243,6 +248,23 @@ Hook 활성화 상태 (Codex가 사용자 지시에 따라 2026-05-17 적용):
 ---
 
 ## Next Work
+
+**CLIENT combat prototype track (2026-05-21):**
+
+1. **CLIENT_BATTLE_ADAPTER — Debug SideB Auto Controller Prototype.**
+   - Keep SideA/local player manual.
+   - Add a runtime SideB rule-based controller that reads `BattleState` and submits `BattleCommand` entries for SideB.
+   - Use existing symmetric SideA/SideB Core API only; do not change BattleSim.Core.
+   - Add a debug toggle/status display if useful.
+2. **CLIENT_BATTLE_ADAPTER — Sandbox Unit Variety Expansion.**
+   - Expand interactive sandbox slot definitions for both sides to cover simple melee/tank, ranged/striker, fast runner, and swarm-like roles.
+   - Keep visuals generic; no art, prefab, scene, package, or ProjectSettings changes.
+3. **CLIENT_BATTLE_ADAPTER + CLIENT_APP — Input Binding And Status Clarity.**
+   - Improve slot/lane selection readability and input affordance for manual SideA play.
+   - Keep the player manual; do not add a SideA auto controller.
+4. **CLIENT_BATTLE_ADAPTER — Balance Tuning Pass.**
+   - Tune energy regen, cooldowns, lane pressure, and SideB spawn rules for quick fun validation.
+   - Preserve deterministic Core behavior and treat Unity as display/input/adapter only.
 
 **Priority track — Worker Infrastructure transition (MCP → CLI):**
 

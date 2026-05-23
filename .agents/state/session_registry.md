@@ -2,14 +2,37 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-18T11:30:00+09:00
+Last Updated: 2026-05-24T02:22:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | Codex | codex-20260518-0605-server-initial-check | SERVER_API + SERVER_DOMAIN + SERVER_DATA + SERVER_BATTLE_VALIDATION | Server repo status and ASP.NET scaffold read-only check | 2026-05-18T06:05:39+09:00 | 2026-05-18T06:05:39+09:00 | Active |
-| Codex | codex-20260518-0602-client-initial-check | CLIENT_APP + CLIENT_BATTLE_ADAPTER + CLIENT_NETWORK | Client repo status and Unity scaffold read-only check | 2026-05-18T06:02:19+09:00 | 2026-05-18T06:02:19+09:00 | Active |
+
+## Recent Completed Sessions (client v0.4 integration)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260524-client-app-v0.4-stage-deck-app-debug-bridge | CLIENT_APP | BattleSim.Core v0.4 client mirror + Stage 4장 프로토타입 덱 + Stage App 디버그 입력 브리지 | 2026-05-24T01:03:14+09:00 | 2026-05-24T02:22:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (battlecore v0.4 combat model expansion)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260524-shared-battle-core-v0.4 | SHARED_BATTLE_CORE | BattleSim.Core v0.4 combat model expansion | 2026-05-24T00:32:11+09:00 | 2026-05-24T00:45:00+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (client lead handoff)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Codex | codex-20260518-0602-client-initial-check | CLIENT_ | Client lead coordination through DebugBattle to Preload/AppRoot stage bootstrap; handoff prepared for replacement CLIENT_ lead | 2026-05-18T06:02:19+09:00 | 2026-05-23T23:57:55+09:00 | Completed; Role released |
+
+## Recent Completed Sessions (client folder restructure)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260519-client-folder-restructure | CLIENT_APP + BUILD_INFRA | Restructure Unity project root by moving contents of My project up to FrontierBastion_client | 2026-05-19T02:40:30+09:00 | 2026-05-19T02:45:00+09:00 | Completed; Role released |
 
 ## Recent Completed Sessions (battlecore API skeleton cleanup)
 
