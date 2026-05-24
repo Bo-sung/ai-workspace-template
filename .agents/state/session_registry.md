@@ -2,13 +2,42 @@
 
 Single source of truth for active sessions and Role occupancy.
 
-Last Updated: 2026-05-24T03:15:00+09:00
+Last Updated: 2026-05-24T15:01:00+09:00
 
 ## Active Sessions
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | Codex | codex-20260518-0605-server-initial-check | SERVER_API + SERVER_DOMAIN + SERVER_DATA + SERVER_BATTLE_VALIDATION | Server repo status and ASP.NET scaffold read-only check | 2026-05-18T06:05:39+09:00 | 2026-05-18T06:05:39+09:00 | Active |
+
+
+## Recent Completed Sessions (client v0.5+v0.7 mirror)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260524-client-api-v0.5-v0.7-mirror | CLIENT_APP | BattleSim.Core v0.5+v0.7 통합 클라이언트 미러 | 2026-05-24T15:01:00+09:00 | 2026-05-24T15:10:00+09:00 | Completed; Role released |
+
+
+## Recent Completed Sessions (battlecore v0.7 event model)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260524-shared-battle-core-v0.7-event-model | SHARED_BATTLE_CORE | BattleSim.Core v0.7 BattleTickEvent 이벤트 모델 구현 | 2026-05-24T09:49:00+09:00 | 2026-05-24T15:00:00+09:00 | Completed; Role released |
+
+
+
+## Recent Completed Sessions (battlecore v0.6 knockback applied)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260524-shared-battle-core-v0.6-knockback | SHARED_BATTLE_CORE | BattleSim.Core v0.6 Knockback 적용 | 2026-05-24T08:51:58+09:00 | 2026-05-24T09:00:00+09:00 | Completed; Role released |
+
+
+## Recent Completed Sessions (battlecore v0.5 projectile combat)
+
+| Agent | Session | Role | Current Task | Started | Last Updated | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260524-shared-battle-core-v0.5-projectile | SHARED_BATTLE_CORE | BattleSim.Core v0.5 projectile combat | 2026-05-24T04:14:21+09:00 | 2026-05-24T05:39:02+09:00 | Completed; Role released |
 
 ## Recent Completed Sessions (client v0.4 integration)
 

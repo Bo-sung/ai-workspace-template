@@ -16,12 +16,13 @@ the base rules.
 4. `.agents/rules/module_permissions.md`.
 5. `.agents/rules/domain_policy.md`.
 6. `.agents/rules/commit_policy.md`.
-7. Optional local overlay files under `.agents/project/`, if present.
-8. `.agents/state/session_registry.md`.
-9. `.agents/state/resource_locks.md`.
-10. `.agents/state/current_progress.md`.
-11. The handoff file for the assigned Role, if one exists.
-12. The lifecycle checklist for the current moment.
+7. `.agents/rules/encoding_policy.md`.
+8. Optional local overlay files under `.agents/project/`, if present.
+9. `.agents/state/session_registry.md`.
+10. `.agents/state/resource_locks.md`.
+11. `.agents/state/current_progress.md`.
+12. The handoff file for the assigned Role, if one exists.
+13. The lifecycle checklist for the current moment.
 
 If a required state or overlay file is missing, do not invent its contents.
 Proceed with the safest default: read-only until the user assigns or approves a

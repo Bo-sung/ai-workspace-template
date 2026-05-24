@@ -2,7 +2,7 @@
 
 Single source of truth for shared resource locks.
 
-Last Updated: 2026-05-24T03:15:00+09:00
+Last Updated: 2026-05-24T15:01:00+09:00
 
 | Type | Resource | Agent | Session | Role | Locked At | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -11,6 +11,10 @@ Last Updated: 2026-05-24T03:15:00+09:00
 
 | Type | Resource | Agent | Session | Released At | Note |
 | --- | --- | --- | --- | --- | --- |
+| Shared Path | Project/FrontierBastion_client/Assets/Scripts/Battle/Plugins/BattleSim.Core.dll, Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/**, Project/FrontierBastion_client/Assets/Scripts/Debug/Battle/DebugBattleScenarioFactory.cs, Project/FrontierBastion_client/Assets/Scripts/App/** | Antigravity | antigravity-20260524-client-api-v0.5-v0.7-mirror | 2026-05-24T15:10:00+09:00 | BattleSim.Core v0.5+v0.7 integration and event-driven rendering completed and verified. |
+| Shared Path | Project/FrontierBastion_battlecore/src/BattleSim.Core/BattleCoreDefaults.cs, Simulation/BattleSimulator.cs, tests/BattleSim.Core.Tests/Simulation/**, State/** | Antigravity | antigravity-20260524-shared-battle-core-v0.7-event-model | 2026-05-24T15:00:00+09:00 | BattleSim.Core v0.7 BattleTickEvent event model completed and verified. |
+| Shared Path | Project/FrontierBastion_battlecore/src/BattleSim.Core/BattleCoreDefaults.cs, Simulation/BattleSimulator.cs, tests/BattleSim.Core.Tests/Simulation/**, State/** | Antigravity | antigravity-20260524-shared-battle-core-v0.6-knockback | 2026-05-24T09:00:00+09:00 | BattleSim.Core v0.6 knockback completed and verified. |
+| Shared Path | Project/FrontierBastion_battlecore/src/BattleSim.Core/BattleCoreDefaults.cs, Config/**, State/BattleState.cs, Simulation/BattleSimulator.cs, tests/BattleSim.Core.Tests/Simulation/**, fixtures/** | Antigravity | antigravity-20260524-shared-battle-core-v0.5-projectile | 2026-05-24T08:51:58+09:00 | BattleSim.Core v0.5 projectile combat completed and verified. |
 | Shared Path | Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/**, Project/FrontierBastion_client/Assets/Scripts/App/** | Antigravity | antigravity-20260524-client-stage-battle-world-view-v0.4 | 2026-05-24T03:15:00+09:00 | Stage Battle World View (v0.4 native) completed and verified with Camera and result banner. |
 | Shared Path | Project/FrontierBastion_client/Assets/Scripts/Battle/Plugins/BattleSim.Core.dll, Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/**, Project/FrontierBastion_client/Assets/Scripts/Debug/Battle/DebugBattleScenarioFactory.cs, Project/FrontierBastion_client/Assets/Scripts/App/** | Antigravity | antigravity-20260524-client-app-v0.4-stage-deck-app-debug-bridge | 2026-05-24T02:22:00+09:00 | BattleSim.Core v0.4 client integration and Stage prototype deck completed and verified. |
 | Shared Path | Project/FrontierBastion_battlecore/src/BattleSim.Core/BattleCoreDefaults.cs, Config/SlotDefinition.cs, Config/LaneDefinition.cs, Simulation/BattleSimulator.cs, tests/BattleSim.Core.Tests/Simulation/**, fixtures/** | Antigravity | antigravity-20260524-shared-battle-core-v0.4 | 2026-05-24T00:45:00+09:00 | BattleSim.Core v0.4 combat model expansion completed and verified with explicit NumericId sorting. |

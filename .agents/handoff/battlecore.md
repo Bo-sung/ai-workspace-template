@@ -10,6 +10,45 @@
 - Current branch after setup: `develop`
 - Initial commit: `ebc93d7` (`chore: scaffold BattleSim.Core repo`)
 
+## Projectile Combat Addendum (2026-05-24)
+
+### Decision Summary
+
+- Phase 1 ranged combat should be **projectile-based**, not hitscan.
+- Melee stays as immediate contact resolution.
+- If a ranged attack crosses lanes, the projectile is spawned and simulated on the **target lane**.
+- The lane model must keep 1D progress, but each lane also needs world start/end coordinates so projectile travel can be simulated deterministically.
+- The two ground lanes should have a default world separation of about 200 so same-progress cross-lane distance is non-zero even when `x` aligns.
+
+### Why This Matters
+
+- Current `BattleSim.Core` ranged resolution subtracts HP on the fire tick.
+- That makes ranged combat feel instantaneous and prevents visible travel time across lanes.
+- The new line model is intended to support parallel ground lanes plus one air lane, so cross-lane projectile travel needs to be explicit in the core rather than implied by distance only.
+
+### Required Core Changes
+
+| Area | Required change |
+| --- | --- |
+| `LaneDefinition` | Add lane start/end world coordinates while keeping 1D progress |
+| Combat resolution | Replace direct ranged HP subtraction with projectile spawn events |
+| Projectile runtime model | Add projectile state: `source lane`, `projectile lane`, `source progress`, `target lane`, `target entity`, `damage snapshot`, `owner`, `ttl`, `speed` |
+| Targeting rules | Same-lane melee stays immediate; ranged and cross-lane shots resolve by projectile arrival |
+| Distance model | Include lane separation in cross-lane distance so melee-range units cannot cross-hit by default |
+| Determinism | Snapshot damage/effects at fire time; bump `config_version` and refresh replay fixtures |
+
+### Open Details For Core
+
+- Exact miss behavior if the target becomes invalid before projectile arrival.
+- Whether the projectile should resolve against a fire-time target snapshot or a live target position on the target lane.
+- Exact collision radius / arrival threshold for projectile hit confirmation.
+
+### Lock / Validation Impact
+
+- `SHARED_BATTLE_CORE` lock is required.
+- `SERVER_BATTLE_VALIDATION` golden fixtures will change.
+- Client mirror work will be needed for projectile spawn / impact visuals and lane-aware rendering.
+
 ## API Skeleton Cleanup (sonnet-20260518-shared-battle-core-api-cleanup)
 
 작성일: 2026-05-18 / Role: SHARED_BATTLE_CORE
