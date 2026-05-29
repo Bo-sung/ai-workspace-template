@@ -6,6 +6,7 @@ Last Updated: 2026-05-24T15:01:00+09:00
 
 | Type | Resource | Agent | Session | Role | Locked At | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
+| Shared Path | Project/FrontierBastion_client/Assets/Scripts/App/**, Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/StageBattleSession.cs, Project/FrontierBastion_client/Assets/Scripts/UI/** | Antigravity | antigravity-20260530-client-ugui-battle-hud-mvp | CLIENT_APP | 2026-05-30T04:31:00+09:00 | uGUI Battle HUD (MVP presenter/view/input-router) |
 
 ## Recently Released
 

@@ -8,6 +8,7 @@ Last Updated: 2026-05-24T15:01:00+09:00
 
 | Agent | Session | Role | Current Task | Started | Last Updated | Status |
 | --- | --- | --- | --- | --- | --- | --- |
+| Antigravity | antigravity-20260530-client-ugui-battle-hud-mvp | CLIENT_APP | uGUI Battle HUD (MVP presenter/view/input-router) | 2026-05-30T04:31:00+09:00 | 2026-05-30T04:31:00+09:00 | Active |
 | Codex | codex-20260518-0605-server-initial-check | SERVER_API + SERVER_DOMAIN + SERVER_DATA + SERVER_BATTLE_VALIDATION | Server repo status and ASP.NET scaffold read-only check | 2026-05-18T06:05:39+09:00 | 2026-05-18T06:05:39+09:00 | Active |
 
 
