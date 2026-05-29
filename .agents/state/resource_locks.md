@@ -6,12 +6,12 @@ Last Updated: 2026-05-24T15:01:00+09:00
 
 | Type | Resource | Agent | Session | Role | Locked At | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
-| Shared Path | Project/FrontierBastion_client/Assets/Scripts/App/**, Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/StageBattleSession.cs, Project/FrontierBastion_client/Assets/Scripts/UI/** | Antigravity | antigravity-20260530-client-ugui-battle-hud-mvp | CLIENT_APP | 2026-05-30T04:31:00+09:00 | uGUI Battle HUD (MVP presenter/view/input-router) |
 
 ## Recently Released
 
 | Type | Resource | Agent | Session | Released At | Note |
 | --- | --- | --- | --- | --- | --- |
+| Shared Path | Project/FrontierBastion_client/Assets/Scripts/App/**, Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/StageBattleSession.cs, Project/FrontierBastion_client/Assets/Scripts/UI/** | Antigravity | antigravity-20260530-client-ugui-battle-hud-mvp | 2026-05-30T05:00:00+09:00 | uGUI Battle HUD MVP (presenter/view/input-router) completed and verified clean build. |
 | Shared Path | Project/FrontierBastion_client/Assets/Scripts/Battle/Plugins/BattleSim.Core.dll, Project/FrontierBastion_client/Assets/Scripts/Battle/Stage/**, Project/FrontierBastion_client/Assets/Scripts/Debug/Battle/DebugBattleScenarioFactory.cs, Project/FrontierBastion_client/Assets/Scripts/App/** | Antigravity | antigravity-20260524-client-api-v0.5-v0.7-mirror | 2026-05-24T15:10:00+09:00 | BattleSim.Core v0.5+v0.7 integration and event-driven rendering completed and verified. |
 | Shared Path | Project/FrontierBastion_battlecore/src/BattleSim.Core/BattleCoreDefaults.cs, Simulation/BattleSimulator.cs, tests/BattleSim.Core.Tests/Simulation/**, State/** | Antigravity | antigravity-20260524-shared-battle-core-v0.7-event-model | 2026-05-24T15:00:00+09:00 | BattleSim.Core v0.7 BattleTickEvent event model completed and verified. |
 | Shared Path | Project/FrontierBastion_battlecore/src/BattleSim.Core/BattleCoreDefaults.cs, Simulation/BattleSimulator.cs, tests/BattleSim.Core.Tests/Simulation/**, State/** | Antigravity | antigravity-20260524-shared-battle-core-v0.6-knockback | 2026-05-24T09:00:00+09:00 | BattleSim.Core v0.6 knockback completed and verified. |
