@@ -57,20 +57,20 @@
 - The new combat support loop is a **stage-only temporary effect**, not a permanent meta upgrade.
 - Support upgrades are purchased during the current stage battle by spending battle energy.
 - Only **one** support upgrade may be active at a time. No parallel upgrades and no queueing.
-- Time is specified at **10 TPS**. One second equals 10 ticks.
+- Time is specified at **20 TPS**. One second equals 20 ticks.
 - Support upgrade tracks:
   - resource upgrade: battle energy regen / storage
   - pilot upgrade: pilot combat stats
 - Each track can be upgraded up to **5 levels**.
 - Resource upgrade:
   - cost at level `L` (1-5): `100 + 10 * (L - 1)`
-  - time: `20 + 5 * L` seconds = `200 + 50 * L` ticks
+  - time: `20 + 5 * L` seconds = `400 + 100 * L` ticks
   - result: battle energy max storage = `100 + 10 * L`
   - result: tick-based battle energy production +10% per level, additive
   - while active, battle energy regeneration stops
 - Pilot upgrade:
   - cost at level `L` (1-5): `50 + 10 * (L - 1)`
-  - time: `20 + 5 * L` seconds = `200 + 50 * L` ticks
+  - time: `20 + 5 * L` seconds = `400 + 100 * L` ticks
   - result: pilot all-stats +10% per level, additive, range excluded
   - while active, pilot summoning is blocked
   - already summoned pilots and drones remain on the battlefield
