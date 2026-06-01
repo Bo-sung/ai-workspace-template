@@ -33,10 +33,15 @@
 
 - Phase 1 has no base defense weapons, wall weapons, or tower weapons to render.
 - The new battle support loop is a **current-stage temporary effect**, not a permanent colony upgrade.
+- Only one support upgrade may run at a time.
+- Time is specified at 10 TPS, so the client should display durations in seconds while keeping tick-based timing aligned with the core.
 - The HUD should present support upgrades as battle-state information tied to the current run.
 - The client should visibly show:
+  - whether a resource upgrade is active
+  - whether a pilot upgrade is active
   - the current support level
   - whether battle energy regeneration is paused
+  - whether pilot summoning is blocked
   - that the effect ends when the current stage battle ends
 - If support upgrades affect pilot combat bonuses, the client should reflect the bonus only inside the active battle and clear it on battle end.
 - Do not present the support upgrade as a persistent base-building or tower-defense layer.

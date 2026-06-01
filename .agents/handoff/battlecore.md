@@ -56,13 +56,25 @@
 - Phase 1 has **no base defense weapons**, **no wall weapons**, and **no tower weapons**.
 - The new combat support loop is a **stage-only temporary effect**, not a permanent meta upgrade.
 - Support upgrades are purchased during the current stage battle by spending battle energy.
+- Only **one** support upgrade may be active at a time. No parallel upgrades and no queueing.
+- Time is specified at **10 TPS**. One second equals 10 ticks.
 - Support upgrade tracks:
-  - battle energy regen increase
-  - battle energy max storage increase
-  - pilot combat bonus for the current stage battle
+  - resource upgrade: battle energy regen / storage
+  - pilot upgrade: pilot combat stats
 - Each track can be upgraded up to **5 levels**.
-- While a support upgrade is in progress, battle energy regeneration stops.
-- The player is expected to survive the upgrade window by relying on stored battle energy and pilot direct deploy actions.
+- Resource upgrade:
+  - cost at level `L` (1-5): `100 + 10 * (L - 1)`
+  - time: `20 + 5 * L` seconds = `200 + 50 * L` ticks
+  - result: battle energy max storage = `100 + 10 * L`
+  - result: tick-based battle energy production +10% per level, additive
+  - while active, battle energy regeneration stops
+- Pilot upgrade:
+  - cost at level `L` (1-5): `50 + 10 * (L - 1)`
+  - time: `20 + 5 * L` seconds = `200 + 50 * L` ticks
+  - result: pilot all-stats +10% per level, additive, range excluded
+  - while active, pilot summoning is blocked
+  - already summoned pilots and drones remain on the battlefield
+- The player is expected to survive the upgrade window by relying on stored battle energy and already deployed units.
 
 ### Core Interpretation
 
@@ -90,8 +102,6 @@
 ### Open Details For Core
 
 - Exact serialization shape for the transient support modifier.
-- Whether the current support level is selected up front or can be progressed mid-battle via commands.
-- Whether pilot combat bonus applies to direct deploy only or to linked drone squad stats as well.
 
 ### Lock / Validation Impact
 
