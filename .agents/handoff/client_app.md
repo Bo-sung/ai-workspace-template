@@ -36,13 +36,27 @@
 - Only one support upgrade may run at a time.
 - Time is specified at 20 TPS, so the client should display durations in seconds while keeping tick-based timing aligned with the core.
 - The HUD should present support upgrades as battle-state information tied to the current run.
+- Sync the latest `BattleSim.Core.dll` from support-upgrade commit `21db43e`.
+- Mirror the new public API:
+  - `BattleSupportTrack`
+  - `BattleSideSupportState`
+  - `BattleCommand.StartSupportUpgrade`
+  - `BattleCommandType.StartSupportUpgrade`
+  - `BattleEventType.SupportUpgradeStarted` / `SupportUpgradeCompleted`
+  - `BattleEvent.SupportTrack` / `SupportLevel`
+  - `BattleSideState.SupportState`
 - The client should visibly show:
   - whether a resource upgrade is active
   - whether a pilot upgrade is active
   - the current support level
+  - the remaining time for the active upgrade
   - whether battle energy regeneration is paused
   - whether pilot summoning is blocked
   - that the effect ends when the current stage battle ends
+- Add UI commands for starting Resource/Pilot support upgrades.
+- Prevalidate `DeployPilot` while Pilot upgrade is active so the player gets immediate feedback.
+- Use `RecentEvents` for visual/UI feedback, especially `SupportUpgradeStarted` and `SupportUpgradeCompleted`.
+- Do not infer support timing from energy deltas alone; use `SupportState` and `RecentEvents`.
 - If support upgrades affect pilot combat bonuses, the client should reflect the bonus only inside the active battle and clear it on battle end.
 - Do not present the support upgrade as a persistent base-building or tower-defense layer.
 
