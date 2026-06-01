@@ -169,3 +169,33 @@ Token-efficiency review concluded MCP is not the right path for this project's m
 
 ---
 *Last Updated by claude-20260516-1400-worker-infra-step3 (Step 3 complete, Step 4 open item added) at 2026-05-16*
+
+---
+
+## Open Item: Repository File Encoding Policy (raised 2026-06-02 by CLIENT_lead)
+
+### Why this is OPS-owned
+`.gitattributes` / `.editorconfig` govern all repos (client / battlecore / plan / server),
+so they are shared infrastructure, not CLIENT_lead's call. OPS should set one policy and
+apply it consistently.
+
+### Observed problems (FrontierBastion_client)
+- `warning: LF will be replaced by CRLF` on nearly every commit — Windows + git
+  autocrlf with no `.gitattributes` rule.
+- UTF-8 BOM noise: a worker-created file once gained a leading BOM (diff churn near
+  client commit `5f76319`). Tooling (Unity / dotnet CLI / Gemini worker / editors)
+  saves EOL+encoding inconsistently.
+
+### Decisions OPS needs to make
+1. Line endings: enforce LF repo-wide? (`* text=auto eol=lf`, or `*.cs text eol=lf`).
+2. BOM: standardize UTF-8 **without** BOM for source.
+3. Unity YAML (`*.meta`/`*.unity`/`*.prefab`/`*.asset`): LF, no BOM (Unity default) — make explicit.
+4. Enforcement: ship a standard `.gitattributes` + `.editorconfig` to all 4 repos.
+5. Whether to one-time renormalize existing files (`git add --renormalize .`).
+
+### Priority
+LOW / non-blocking. Warnings are harmless; BOM churn is occasional. Bundle this with the
+next OPS session rather than interrupting feature work. SERVER_BATTLE_VALIDATION should be
+consulted if renormalization could alter golden-fixture JSON byte content/hashes.
+
+*Raised by CLIENT_lead at 2026-06-02 (handoff via chat + this note).*
