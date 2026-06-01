@@ -49,6 +49,56 @@
 - `SERVER_BATTLE_VALIDATION` golden fixtures will change.
 - Client mirror work will be needed for projectile spawn / impact visuals and lane-aware rendering.
 
+## Battle Support Upgrade Addendum (2026-06-01)
+
+### Decision Summary
+
+- Phase 1 has **no base defense weapons**, **no wall weapons**, and **no tower weapons**.
+- The new combat support loop is a **stage-only temporary effect**, not a permanent meta upgrade.
+- Support upgrades are purchased during the current stage battle by spending battle energy.
+- Support upgrade tracks:
+  - battle energy regen increase
+  - battle energy max storage increase
+  - pilot combat bonus for the current stage battle
+- Each track can be upgraded up to **5 levels**.
+- While a support upgrade is in progress, battle energy regeneration stops.
+- The player is expected to survive the upgrade window by relying on stored battle energy and pilot direct deploy actions.
+
+### Core Interpretation
+
+- This is not a colony-level permanent stat increase.
+- The effect must be treated as a **transient battle modifier** bound to the current stage battle.
+- The modifier expires when the stage battle ends.
+- If the core needs to serialize this state, it should live in battle runtime state or battle snapshot data, not in permanent account progression.
+
+### Why This Matters
+
+- The old tower-defense style interpretation is no longer valid for Phase 1 combat.
+- Core logic and validation should not assume persistent base defense weapon upgrades.
+- Client and server replay / validation need to agree on the same temporary support state so the battle remains deterministic.
+
+### Required Core Changes
+
+| Area | Required change |
+| --- | --- |
+| Battle state | Add a transient stage-battle support modifier state |
+| Battle energy | Support upgrades pause regeneration while active |
+| Pilot bonus | Apply only for the current stage battle, then clear on battle end |
+| Persistence | Do not store as permanent colony progression |
+| Validation | Include the support modifier in deterministic replay / golden fixtures if it affects outcomes |
+
+### Open Details For Core
+
+- Exact serialization shape for the transient support modifier.
+- Whether the current support level is selected up front or can be progressed mid-battle via commands.
+- Whether pilot combat bonus applies to direct deploy only or to linked drone squad stats as well.
+
+### Lock / Validation Impact
+
+- `SHARED_BATTLE_CORE` lock is required if the modifier enters core state or replay contracts.
+- `SERVER_BATTLE_VALIDATION` fixtures may change if support state affects damage, regen, or deploy cadence.
+- Client HUD must display the support level and the regen pause state clearly.
+
 ## API Skeleton Cleanup (sonnet-20260518-shared-battle-core-api-cleanup)
 
 작성일: 2026-05-18 / Role: SHARED_BATTLE_CORE

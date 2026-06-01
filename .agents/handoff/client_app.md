@@ -29,12 +29,25 @@
 - The client should show travel time, impact, and lane-specific arrival, even if the battle core resolves the actual hit deterministically.
 - Projectile and impact effects should use world-space / `SpriteRenderer` style rendering, not large uGUI images for combat actors.
 
+## Battle Support Upgrade Presentation (2026-06-01)
+
+- Phase 1 has no base defense weapons, wall weapons, or tower weapons to render.
+- The new battle support loop is a **current-stage temporary effect**, not a permanent colony upgrade.
+- The HUD should present support upgrades as battle-state information tied to the current run.
+- The client should visibly show:
+  - the current support level
+  - whether battle energy regeneration is paused
+  - that the effect ends when the current stage battle ends
+- If support upgrades affect pilot combat bonuses, the client should reflect the bonus only inside the active battle and clear it on battle end.
+- Do not present the support upgrade as a persistent base-building or tower-defense layer.
+
 ## Required Follow-up
 
 1. Update any stage battle view / lane layout code to use distinct world positions for each lane.
 2. Mirror projectile lane assignment from the core contract so cross-lane shots do not visually spawn on the wrong path.
 3. Keep the client in sync with `BattleSim.Core` contract changes if projectile state fields are added or renamed.
-4. If the data contract changes, treat it as a shared-core dependency and coordinate with `SHARED_BATTLE_CORE`.
+4. Render support upgrade state in the battle HUD and clear it when the stage ends.
+5. If the data contract changes, treat it as a shared-core dependency and coordinate with `SHARED_BATTLE_CORE`.
 
 ## Risks / Notes
 
